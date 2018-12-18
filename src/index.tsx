@@ -1,149 +1,141 @@
-import * as React from "react";
+import * as React from 'react'
 
 interface Props {
-  children: React.ReactElement<any>;
-  once?: boolean;
-  onReveal: () => void;
-  options?: { [key: string]: any };
+  children: React.ReactElement<any>
+  once?: boolean
+  onReveal: () => void
+  options?: { [key: string]: any }
 }
 
-export const Reveal = ({
-  children,
-  once = false,
-  onReveal,
-  options = {}
-}: Props) => {
-  const [seenBefore, setSeenBefore] = React.useState(false);
-  const ioRef = React.useRef(null);
-  const rootRef = React.useRef(null);
+export const Reveal = ({ children, once = false, onReveal, options = {} }: Props) => {
+  const [seenBefore, setSeenBefore] = React.useState(false)
+  const ioRef = React.useRef(null)
+  const rootRef = React.useRef(null)
 
   const cleanup = React.useCallback(() => {
-    ioRef.current.unobserve(rootRef.current);
+    ioRef.current.unobserve(rootRef.current)
 
-    ioRef.current.disconnect();
-  }, []);
+    ioRef.current.disconnect()
+  }, [])
 
   const handleReveal = React.useCallback(
     () => {
-      if (!seenBefore) setSeenBefore(true);
+      if (!seenBefore) setSeenBefore(true)
 
-      onReveal();
+      onReveal()
 
-      if (once) cleanup();
+      if (once) cleanup()
     },
     [rootRef, seenBefore]
-  );
+  )
 
   const handleIoUpdates = React.useCallback(
     ([entry]) => {
-      if (entry.isIntersecting || entry.intersectionRatio > 0) handleReveal();
+      if (entry.isIntersecting || entry.intersectionRatio > 0) handleReveal()
     },
     [ioRef]
-  );
+  )
 
   React.useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return
 
-    ioRef.current = new IntersectionObserver(handleIoUpdates, options);
+    ioRef.current = new IntersectionObserver(handleIoUpdates, options)
 
-    ioRef.current.observe(rootRef.current);
+    ioRef.current.observe(rootRef.current)
 
-    return cleanup;
-  }, []);
+    return cleanup
+  }, [])
 
-  const child = React.Children.only(children);
+  const child = React.Children.only(children)
 
   const clone = React.cloneElement(child, {
     ref: node => {
-      rootRef.current = node;
+      rootRef.current = node
     }
-  });
+  })
 
-  return clone;
-};
+  return clone
+}
 
 interface LazyImageProps {
-  alt?: string;
-  critical?: boolean;
-  onError?: (e: any) => void;
-  onLoad?: (a: any) => void;
-  src: string | string[];
+  alt?: string
+  critical?: boolean
+  onError?: (e: any) => void
+  onLoad?: (a: any) => void
+  src: string | string[]
 }
 
 interface LazyBackgroundImageProps {
-  critical?: boolean;
-  children: React.ReactElement<any>;
-  onError?: (e: any) => void;
-  onLoad?: (a: any) => void;
-  src: string;
+  critical?: boolean
+  children: React.ReactElement<any>
+  onError?: (e: any) => void
+  onLoad?: (a: any) => void
+  src: string
 }
 
-const imageCache = new Map();
+const imageCache = new Map()
 
-type LazyImageMessage = "LOADED" | "VISIBLE" | "ERROR" | "REAPPEAR";
+type LazyImageMessage = 'LOADED' | 'VISIBLE' | 'ERROR' | 'REAPPEAR'
 
 const lazyImageReducer = (state, action) => {
   switch (action.type) {
-    case "LOADED":
+    case 'LOADED':
       return {
         ...state,
         imgLoaded: true
-      };
+      }
 
-    case "REAPPEAR":
-    case "VISIBLE":
+    case 'REAPPEAR':
+    case 'VISIBLE':
       return {
         ...state,
         imgVisible: true
-      };
+      }
 
-    case "ERROR":
+    case 'ERROR':
       return {
         ...state,
         imgLoaded: false
-      };
+      }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
-export const LazyBackgroundImage = ({
-  src,
-  children
-}: LazyBackgroundImageProps) => {
+export const LazyBackgroundImage = ({ src, children }: LazyBackgroundImageProps) => {
   const [state, dispatch] = React.useReducer(lazyImageReducer, {
     imgLoaded: false,
     imgVisible: false,
     seenBefore: imageCache.has(src)
-  });
+  })
 
   const handleImageVisible = React.useCallback(
     () => {
-      dispatch({ type: "VISIBLE" });
+      dispatch({ type: 'VISIBLE' })
 
       if (state.seenBefore) {
-        dispatch({ type: "REAPPEAR" });
+        dispatch({ type: 'REAPPEAR' })
       } else {
-        const img = new Image();
+        const img = new Image()
 
-        img.src = src;
+        img.src = src
 
         img.onload = () => {
-          imageCache.set(src, src);
+          imageCache.set(src, src)
 
-          dispatch({ type: "LOADED" });
-        };
+          dispatch({ type: 'LOADED' })
+        }
 
         img.onerror = () => {
-          dispatch({ type: "ERROR" });
-        };
+          dispatch({ type: 'ERROR' })
+        }
       }
     },
     [state.seenBefore, src]
-  );
+  )
 
-  const child = React.Children.only(children);
+  const child = React.Children.only(children)
 
   const clone = React.cloneElement(child, {
     ...(state.imgVisible && state.imgLoaded
@@ -154,14 +146,14 @@ export const LazyBackgroundImage = ({
           }
         }
       : {})
-  });
+  })
 
   return (
     <Reveal once={true} onReveal={handleImageVisible}>
-      <div style={{ height: "100%", width: "100%" }}>
+      <div style={{ height: '100%', width: '100%' }}>
         <div className="placeholder" />
         {clone}
       </div>
     </Reveal>
-  );
-};
+  )
+}
