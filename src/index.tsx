@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+export * from './Dropout'
+
 interface Props {
   children: React.ReactElement<any>
   once?: boolean
