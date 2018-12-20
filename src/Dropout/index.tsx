@@ -14,6 +14,7 @@ interface Store {
 }
 
 const createStore = (reducer, initialState): Store => {
+  // @ts-ignore
   const store: Store = {}
 
   store.state = initialState
@@ -41,7 +42,9 @@ let selectingWithClickNode = null
 
 const createNamedContext = (name, defaultValue = {}) => {
   const Ctx = React.createContext(defaultValue)
+  // @ts-ignore
   Ctx.Consumer.displayName = `${name}.Consumer`
+  // @ts-ignore
   Ctx.Provider.displayName = `${name}.Provider`
 
   return Ctx
@@ -145,16 +148,23 @@ class DropoutOption extends React.Component<DropoutOptionProps, DropoutOptionSta
   render() {
     const {
       children,
+      // @ts-ignore
       value,
 
       // implicit (from context...?)
+      // @ts-ignore
       transition,
+      // @ts-ignore
       onSelect,
+      // @ts-ignore
       contextValue,
+      // @ts-ignore
       navigationValue,
 
       // wrapped
+      // @ts-ignore
       onClick,
+      // @ts-ignore
       onMouseDown,
 
       ...props
@@ -174,7 +184,6 @@ class DropoutOption extends React.Component<DropoutOptionProps, DropoutOptionSta
 }
 
 const mainReducer = (state, action) => {
-  console.log(action.type)
   switch (action.type) {
     case '': {
       return ''
@@ -250,13 +259,14 @@ class DropoutInput extends React.Component<InputProps, InputState> {
   }
 
   handleChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value
+    const inputValue = event.currentTarget.value
+    const safeInputValue = inputValue.trim() // TODO: escape special chars too
 
-    if (value.trim() === '') {
+    if (safeInputValue === '') {
       //
     } else {
-      this.context.dispatch({ type: 'CHANGE', value })
-      this.setState({ value })
+      this.context.dispatch({ type: 'CHANGE', value: safeInputValue })
+      this.setState({ value: safeInputValue })
     }
   }
 
@@ -290,7 +300,9 @@ class DropoutInput extends React.Component<InputProps, InputState> {
   render() {
     const {
       // highlights all the text in the box on click when true
+      // @ts-ignore
       selectOnClick = false,
+      // @ts-ignore
       autocompleteOnNav = true,
 
       // wrapped events

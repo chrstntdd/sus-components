@@ -1,6 +1,9 @@
 node_modules
 dist/*
 build/*
+lib/*
+/.rts2_cache_cjs
+/.rts2_cache_esm
 .docz
 .cache
 .DS_Store

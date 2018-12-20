@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom'
 
-import { Dropout, DropoutInput, DropoutList, DropoutOption } from '../dist'
+import { Dropout, DropoutInput, DropoutList, DropoutOption } from '../lib'
 
 if (module.hot) {
   module.hot.accept(() => {
