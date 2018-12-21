@@ -1,6 +1,12 @@
 import * as React from 'react'
 
-import { Portal } from '../shared'
+import { Portal } from './Portal'
+
+/**
+ * @description
+ * A set of components to build an (accessible)
+ * combobox. Using classes here for compat reasons
+ */
 
 type StateObj = { [key: string]: any }
 
