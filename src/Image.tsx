@@ -4,27 +4,6 @@ import { Reveal } from './Reveal'
 
 const imageCache = new Map()
 
-const useImage = (src: string, onLoad?, onError?) => {
-  // generate id for key, value is intended url or eventual fallback url
-  const alreadyLoaded = imageCache.has(src)
-
-  if (alreadyLoaded) return
-
-  const imageResource = new Image()
-
-  imageResource.src = src
-
-  imageResource.onload = () => {
-    onLoad && onLoad([imageResource.height, imageResource.width])
-
-    imageCache.set(src, src)
-  }
-
-  imageResource.onerror = () => {
-    onError && onError()
-  }
-}
-
 /**
  * @description
  * Since enums emit so much extra code, this approach
@@ -47,6 +26,8 @@ type ImageTypeMap = {
   readonly BackgroundImage: 1
 }
 
+type ImageUnion = ImageTypeMap['NativeImageTag'] | ImageTypeMap['BackgroundImage']
+
 /**
  * @description
  * Props shared between all image variants.
@@ -58,7 +39,7 @@ type ImageTypeMap = {
  */
 type CommonImageProps = {
   src: string
-  type: ImageTypeMap['NativeImageTag'] | ImageTypeMap['BackgroundImage']
+  type: ImageUnion
   critical?: boolean
   onError?: (e: any) => void
   onLoad?: (a: any) => void
@@ -88,7 +69,8 @@ const lazyImageReducer = (state, action) => {
     case 'LOADED':
       return {
         ...state,
-        imgLoaded: true
+        imgLoaded: true,
+        imageData: action.data
       }
 
     case 'REAPPEAR':
@@ -113,36 +95,48 @@ const lazyImageReducer = (state, action) => {
  * @description
  * Main `<Image />` component to handle all cases.
  */
-const SusImage = ({ src, type, ...props }: NativeImageProps | BackgroundImageProps) => {
+const SusImage = ({ src, type, critical, ...props }: NativeImageProps | BackgroundImageProps) => {
   const seenBefore = React.useMemo(() => imageCache.has(src), [src])
 
   const [state, dispatch] = React.useReducer(lazyImageReducer, {
     seenBefore,
+    imageData: null,
     imgLoaded: seenBefore,
     imgVisible: false
   })
+
+  const imageOnLoad = React.useCallback(
+    img => () => {
+      imageCache.set(src, src)
+
+      dispatch({ type: 'LOADED', data: img })
+    },
+    [src]
+  )
+
+  const imageOnError = React.useCallback(() => {
+    dispatch({ type: 'ERROR' })
+  }, [])
+
+  const loadImage = React.useCallback(
+    () => {
+      const img = new Image()
+
+      img.src = src
+
+      img.onload = imageOnLoad(img)
+
+      img.onerror = imageOnError
+    },
+    [src]
+  )
 
   const handleImageVisible = React.useCallback(
     () => {
       dispatch({ type: 'VISIBLE' })
 
-      if (state.seenBefore) {
-        dispatch({ type: 'REAPPEAR' })
-      } else {
-        const img = new Image()
-
-        img.src = src
-
-        img.onload = () => {
-          imageCache.set(src, src)
-
-          dispatch({ type: 'LOADED' })
-        }
-
-        img.onerror = () => {
-          dispatch({ type: 'ERROR' })
-        }
-      }
+      if (state.seenBefore) dispatch({ type: 'REAPPEAR' })
+      else type === ImageType.BackgroundImage && loadImage()
     },
     [state.seenBefore, src]
   )
@@ -152,16 +146,17 @@ const SusImage = ({ src, type, ...props }: NativeImageProps | BackgroundImagePro
       const child = React.Children.only(props.children)
 
       const commonProps = {
-        className: `${child.props.className} lazy-img`
+        className: `${child.props.className || ''} lazy-img`
       }
 
       const clone = React.cloneElement(child, {
-        ...(state.imgVisible && state.imgLoaded
+        ...((state.imgVisible || critical) && state.imgLoaded
           ? {
               style: {
                 ...child.props.style,
-                minHeight: '200px',
-                minWidth: '300px',
+                height: state.imageData.height / 3,
+                width: state.imageData.width / 3,
+                opacity: state.imgLoaded ? 1 : 0,
                 backgroundImage: `url(${imageCache.get(src)})`
               },
               ...commonProps
@@ -169,18 +164,48 @@ const SusImage = ({ src, type, ...props }: NativeImageProps | BackgroundImagePro
           : commonProps)
       })
 
-      return (
-        <Reveal once={true} onReveal={handleImageVisible}>
-          <div style={{ height: '100%', width: '100%' }}>
-            <div className="placeholder" />
-            {clone}
-          </div>
-        </Reveal>
+      const el = (
+        <div>
+          <div className="placeholder" />
+          {clone}
+        </div>
       )
+
+      if (critical) {
+        if (!state.imgLoaded) loadImage()
+
+        return el
+      } else {
+        return (
+          <Reveal once onReveal={handleImageVisible}>
+            {el}
+          </Reveal>
+        )
+      }
     }
 
     case ImageType.NativeImageTag:
-      return null
+      return (
+        <Reveal once onReveal={handleImageVisible}>
+          <div>
+            {(state.imgVisible || critical) && (
+              <img
+                className="lazy-img"
+                style={{
+                  opacity: state.imgLoaded ? 1 : 0,
+                  ...(state.imgLoaded && {
+                    height: state.imageData.height / 2,
+                    width: state.imageData.width / 2
+                  })
+                }}
+                src={src}
+                onLoad={l => imageOnLoad(l.currentTarget)()}
+                onError={imageOnError}
+              />
+            )}
+          </div>
+        </Reveal>
+      )
   }
 }
 
