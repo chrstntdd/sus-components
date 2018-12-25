@@ -5,8 +5,8 @@
   "license": "MIT",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
-  "source": "src/index.tsx",
-  "types": "lib/src",
+  "source": "src/index.ts",
+  "types": "lib/types",
   "sideEffects": false,
   "scripts": {
     "dev": "./node_modules/.bin/concurrently -k -p '[{name}]' -n 'Library,ExampleApp' -c 'green.bold,cyan.bold' './scripts/build.ts dev-lib' 'parcel serve examples/index.html'",
@@ -36,12 +36,13 @@
     "microbundle": "^0.9.0",
     "parcel": "^1.11.0",
     "prettier": "^1.15.3",
-    "react": "^16.7.0-alpha.2",
-    "react-dom": "^16.7.0-alpha.2",
+    "react": "16.7.0-alpha.2",
+    "react-dom": "16.7.0-alpha.2",
     "react-testing-library": "^5.4.0",
     "rollup": "^0.68.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-typescript": "^1.0.0",
+    "sass": "^1.15.2",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
@@ -61,5 +62,8 @@
       "./node_modules/.bin/prettier --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "@chrstntdd/router": "^0.0.7"
   }
 }

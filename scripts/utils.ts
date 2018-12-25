@@ -46,15 +46,13 @@ const resolveBin = (modName: string, { executable = modName, cwd = process.cwd()
   }
 }
 
-const removeOldFiles = async (dir?: string) => {
-  const directory = buildDirectoryLabel(dir)
+const removeOldFiles = async (dir: string) => {
+  const directoryLabel = buildDirectoryLabel(dir)
 
   try {
-    const pathName = join(__dirname, dir || 'lib')
+    await spawn.sync('rm', ['-rf', dir], { stdio: 'inherit' })
 
-    await spawn.spawn('rm', ['-rf', pathName])
-
-    process.stdout.write(`🧼  Cleaned out all them old files from ${directory} 🧽\n`)
+    process.stdout.write(`🧼  Cleaned out all them old files from ${directoryLabel} 🧽\n`)
   } catch (error) {
     process.stdout.write('Unable to remove old files')
   }

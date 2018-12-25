@@ -2,7 +2,7 @@ import typescript from 'rollup-plugin-typescript'
 import resolve from 'rollup-plugin-node-resolve'
 import pkg from '../package.json'
 
-const input = 'src/index.tsx'
+const input = 'src/index.ts'
 
 const shared = {
   external: ['react', 'react-dom'],

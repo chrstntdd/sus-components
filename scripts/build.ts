@@ -16,6 +16,7 @@ const asyncWriteFile = promisify(writeFile)
 
 const rollupBin = resolveBin('rollup')
 const microBundleBin = resolveBin('microbundle')
+const concurrentlyBin = resolveBin('concurrently')
 
 const paths = {
   src: join(__dirname, '../src'),
@@ -24,6 +25,7 @@ const paths = {
 }
 
 const sharedRollupArgs = ['-c', paths.rollupConfig, '-m']
+const sharedMicrobundleArgs = ['--external', 'react,react-dom', '-f', 'cjs,esm', '--no-compress']
 
 const [, , script, ...args] = process.argv
 
@@ -31,12 +33,28 @@ type ScriptTypes = {
   'build-lib': string
   'dev-lib': string
   'transpile-only': string
+  'build-single-lib': string
 }
 
 const SCRIPTS: ScriptTypes = {
-    'build-lib': 'build-lib',
-    'dev-lib': 'dev-lib',
-    'transpile-only': 'transpile-only'
+  'build-lib': 'build-lib',
+  'dev-lib': 'dev-lib',
+  'transpile-only': 'transpile-only',
+  'build-single-lib': 'build-single-lib'
+}
+
+// \\
+
+const emitTypeDefs = async () => {
+    try {
+      await spawn.spawn(
+        resolveBin('tsc'),
+        ['--declaration', '--outDir', `${paths.lib}/types`, '--emitDeclarationOnly'],
+        { stdio: 'inherit' }
+      )
+    } catch (error) {
+      console.log('Unable to create type definitions', { error })
+    }
   }
 
   //\\
@@ -46,6 +64,45 @@ const SCRIPTS: ScriptTypes = {
   // process.stdout.write('\x1Bc')
 
   switch (s) {
+    // accept an --all flag to bundle all components
+    // this script isn't meant for production, more just to see the size
+    // of a particular bundled component
+    case SCRIPTS['build-single-lib']: {
+      await removeOldFiles(paths.lib)
+      await emitTypeDefs()
+
+      if (args.length) {
+        // handle args
+      }
+
+      const allComponents = await recursiveReadDir(paths.src, /\.tsx$/)
+
+      Promise.all(
+        allComponents.map(path => {
+          const [file] = path.split('/').reverse()
+
+          const [fileNameWithoutExtension] = file.split('.')
+
+          return spawn.spawn(
+            microBundleBin,
+            [
+              '-i',
+              `${paths.src}/${file}`,
+              '--output',
+              `${paths.lib}/${fileNameWithoutExtension}`,
+              '--name',
+              fileNameWithoutExtension,
+              ...sharedMicrobundleArgs
+            ],
+            {
+              stdio: 'inherit'
+            }
+          )
+        })
+      )
+
+      break
+    }
     /**
      * @description
      * unstable script to transpile TypeScript source to Javascript — without
@@ -53,6 +110,7 @@ const SCRIPTS: ScriptTypes = {
      */
     case SCRIPTS['transpile-only']: {
       await removeOldFiles(paths.lib)
+      await emitTypeDefs()
 
       const sources = await recursiveReadDir(paths.src, /\.(ts|tsx)$/)
 
@@ -100,21 +158,22 @@ const SCRIPTS: ScriptTypes = {
       break
     }
     case SCRIPTS['build-lib']: {
-      await removeOldFiles()
+      await removeOldFiles(paths.lib)
+      await emitTypeDefs()
 
-      await spawn.spawn(
-        microBundleBin,
-        ['--external', 'react,react-dom', '-f', 'cjs,esm', '--no-compress'],
-        {
-          stdio: 'inherit'
-        }
-      )
+      await spawn.spawn(microBundleBin, sharedMicrobundleArgs, {
+        stdio: 'inherit'
+      })
 
       break
     }
 
     case SCRIPTS['dev-lib']: {
-      await removeOldFiles()
+      // await removeOldFiles(paths.lib)
+      // omit emitting type defs since this isn't needed for development
+      // and it also breaks the concurrent nature of the 'dev' script
+
+      setTimeout(() => {}, 0)
 
       await spawn.spawn(rollupBin, [...sharedRollupArgs, '-w'], { stdio: 'inherit' })
 
