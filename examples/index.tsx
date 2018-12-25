@@ -1,7 +1,27 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom'
 
-import { Dropout, DropoutInput, DropoutList, DropoutOption, SusImage } from '../lib'
+import {
+  Dropout,
+  DropoutInput,
+  DropoutList,
+  DropoutOption,
+  BackgroundImage,
+  ImageType,
+  Router,
+  Link,
+  useToggle
+} from '../lib'
+
+export const loadScript = src => {
+  const script = document.createElement('script')
+  script.src = src
+  document.body.appendChild(script)
+}
+
+if (!('IntersectionObserver' in window)) {
+  loadScript('https://unpkg.com/intersection-observer@0.5.1/intersection-observer')
+}
 
 const remoteImageAssets = [
   'https://images.unsplash.com/photo-1545271428-47057449c00c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1867&q=80',
@@ -11,7 +31,10 @@ const remoteImageAssets = [
   'https://images.unsplash.com/photo-1545199143-c6f9256ec576?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2389&q=80',
   'https://images.unsplash.com/photo-1545253088-55b119d82e83?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80',
   'https://images.unsplash.com/photo-1545273920-c6a376292092?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1868&q=80',
-  'https://images.unsplash.com/photo-1545256968-9b87acc4e9de?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80'
+  'https://images.unsplash.com/photo-1545256968-9b87acc4e9de?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80',
+  'https://source.unsplash.com/random/2000x1000',
+  'https://source.unsplash.com/random/3000x1000',
+  'https://source.unsplash.com/random/1000x1000'
 ]
 
 if (module.hot) {
@@ -20,23 +43,22 @@ if (module.hot) {
   })
 }
 
-const useToggle = (initial: boolean) => {
-  const [on, setOn] = React.useState(initial)
+const Home = () => (
+  <div>
+    <div className="image-container">
+      {remoteImageAssets.map((src, i) => (
+        <BackgroundImage type={ImageType.BackgroundImage} key={src} src={src} critical={i < 3}>
+          <div />
+        </BackgroundImage>
+      ))}
+    </div>
+  </div>
+)
 
-  const toggle = React.useCallback(
-    () => {
-      setOn(!on)
-    },
-    [on]
-  )
-
-  return [on, toggle]
-}
-
-const App = () => {
+const PageTwo = () => {
   const [on, toggle] = useToggle(false)
 
-  const app = (
+  return (
     <div>
       <Dropout>
         <DropoutInput className="input" />
@@ -53,25 +75,20 @@ const App = () => {
       </Dropout>
     </div>
   )
+}
 
+const App = () => {
   try {
     return (
       <React.Fragment>
-        <button type="button" onClick={toggle}>
-          Toggle app mount
-        </button>
-
-        <div className="image-container">
-          {remoteImageAssets.map((src, i) => {
-            return (
-              <SusImage type={ImageEnum.BackgroundImage} key={src} src={src}>
-                <div />
-              </SusImage>
-            )
-          })}
-        </div>
-
-        {on ? app : null}
+        <nav className="nav-links">
+          <Link to="/">Home</Link>
+          <Link to="/2">2</Link>
+        </nav>
+        <Router>
+          <Home path="/" />
+          <PageTwo path="/2" />
+        </Router>
       </React.Fragment>
     )
   } catch (error) {
