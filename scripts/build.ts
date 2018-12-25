@@ -25,7 +25,7 @@ const paths = {
 }
 
 const sharedRollupArgs = ['-c', paths.rollupConfig, '-m']
-const sharedMicrobundleArgs = ['--external', 'react,react-dom', '-f', 'cjs,esm', '--no-compress']
+const sharedMicrobundleArgs = ['--external', 'react,react-dom', '-f', 'es,cjs', '--no-compress']
 
 const [, , script, ...args] = process.argv
 

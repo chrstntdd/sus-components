@@ -9,14 +9,14 @@
   "types": "lib/types",
   "sideEffects": false,
   "scripts": {
-    "dev": "./node_modules/.bin/concurrently -k -p '[{name}]' -n 'Library,ExampleApp' -c 'green.bold,cyan.bold' './scripts/build.ts dev-lib' 'parcel serve examples/index.html'",
+    "dev": "concurrently -k -p '[{name}]' -n 'Library,ExampleApp' -c 'green.bold,cyan.bold' './scripts/build.ts dev-lib' 'parcel serve examples/index.html'",
     "trans": "./scripts/build.ts transpile-only",
-    "lint": "./node_modules/.bin/tslint -c tslint.json '{src,scripts}/**/*.{ts,tsx}' -t codeFrame --fix",
+    "lint": "tslint -c tslint.json '{src,scripts}/**/*.{ts,tsx}' -t codeFrame --fix",
     "build-lib": "./scripts/build.ts build-lib",
     "build-example": "parcel build examples/index.html",
     "docz-dev": "docz dev",
     "docz-build": "docz build",
-    "prettier": "./node_modules/.bin/prettier --write 'src/**/*.{ts,tsx,mdx}'"
+    "prettier": "prettier --write 'src/**/*.{ts,tsx,mdx}'"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
@@ -58,9 +58,16 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "./node_modules/.bin/prettier --write",
-      "git add"
+    "linters": {
+      "*": [
+        "yarn prettier",
+        "git add"
+      ]
+    },
+    "ignore": [
+      "yarn.lock",
+      ".gitignore",
+      "node_modules"
     ]
   },
   "dependencies": {

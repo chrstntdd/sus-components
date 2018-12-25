@@ -4,4 +4,4 @@ export * from './Image'
 export * from './Dropout'
 export * from './BackgroundImage'
 
-export * from './hooks'
+export { useToggle, useIntersectionObserver } from './hooks'
