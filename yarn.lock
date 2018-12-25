@@ -1147,12 +1147,12 @@
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.10.tgz#4897974cc317bf99d4fe6af1efa15957fa9c94de"
   integrity sha512-DC8xTuW/6TYgvEg3HEXS7cu9OijFqprVDXXiOcdOKZCU/5PJNLZU37VVvmZHdtMiGOa8wAA/We+JzbdxFzQTRQ==
 
-"@types/node@*", "@types/node@^10.12.15":
+"@types/node@*":
   version "10.12.17"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.17.tgz#7040565b2c93d59325a68fa69073e754a7eda93a"
   integrity sha512-umSCRkjWH70uNzFiOof5yxCqrMXIBJ9UJJUzbEsmtWt8apURQh06pylGMqnhdjHGJSeoBrhzk+mibu6NgL1oBA==
 
-"@types/node@^10.11.7":
+"@types/node@^10.11.7", "@types/node@^10.12.18":
   version "10.12.18"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
   integrity sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==
@@ -1894,7 +1894,7 @@ babel-plugin-jest-hoist@^23.2.0:
   resolved "https://registry.yarnpkg.com/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-23.2.0.tgz#e61fae05a1ca8801aadee57a6d66b8cefaf44167"
   integrity sha1-5h+uBaHKiAGq3uV6bWa4zvr0QWc=
 
-babel-plugin-macros@^2.0.0, babel-plugin-macros@^2.4.0:
+babel-plugin-macros@^2.0.0, babel-plugin-macros@^2.4.3:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/babel-plugin-macros/-/babel-plugin-macros-2.4.3.tgz#870345aa538d85f04b4614fea5922b55c45dd551"
   integrity sha512-M8cE1Rx0zgfKYBWAS+T6ZVCLGuTKdBI5Rn3fu9q6iVdH0UjaXdmF501/VEYn7kLHCgguhGNk5JBzOn64e2xDEA==
@@ -1946,10 +1946,10 @@ babel-polyfill@^6.23.0:
     core-js "^2.5.0"
     regenerator-runtime "^0.10.5"
 
-babel-preset-docz@^0.13.3:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/babel-preset-docz/-/babel-preset-docz-0.13.3.tgz#f742c216d784a00116f10c41c02cb14b8e8b6bad"
-  integrity sha512-0aIOVvlW5Ro/7GskcG1Euo+ZerrCCCmyBEh8ek/VkhQKJkKZP4BQa34Xzagk2V0vuZROFep8qT8vxoxlCDtSvQ==
+babel-preset-docz@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/babel-preset-docz/-/babel-preset-docz-0.13.5.tgz#64c5453eb2b128b9edb21e50eaf7c2cb458fd04e"
+  integrity sha512-XEN10Y2X8MOPWZGs3DybGCuLAUIeVvU5WqZeUVCGv9q52ncuZDnYewp9PsiaZRb5soM+dThZs2jnM7AKruYhbg==
   dependencies:
     "@babel/core" "7.2.2"
     "@babel/plugin-proposal-class-properties" "7.2.1"
@@ -1962,7 +1962,7 @@ babel-preset-docz@^0.13.3:
     "@babel/preset-flow" "7.0.0"
     "@babel/preset-react" "7.0.0"
     "@babel/preset-typescript" "7.1.0"
-    babel-plugin-macros "^2.4.0"
+    babel-plugin-macros "^2.4.3"
     babel-plugin-react-docgen "^2.0.0"
     babel-plugin-transform-dynamic-import "^2.0.0"
     babel-plugin-transform-react-remove-prop-types "^0.4.21"
@@ -3967,10 +3967,10 @@ doctrine@^2.0.0:
   dependencies:
     esutils "^2.0.2"
 
-docz-core@^0.13.4:
-  version "0.13.4"
-  resolved "https://registry.yarnpkg.com/docz-core/-/docz-core-0.13.4.tgz#f4691ff93fca8af9f875954896313605fa4ec9ef"
-  integrity sha512-pzkgK9AOexaLMo/ewRxhhvN2eYfWUYjbQ/75t4e8ymN7+fILNcEQEAri217oHfmnLk+Hwis+9PDt1x9dVNUF5g==
+docz-core@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/docz-core/-/docz-core-0.13.5.tgz#3e06a99d0b771f8a8a3eb8d4c9d4cca809128bf9"
+  integrity sha512-j4Bb/Lduxdfvem3qerz52+YNcPNvzIF+qVXSJwobkSgqhzjbm/ut+VUsbtOjPWtzsbbUpX9ZEu5isWw661fURg==
   dependencies:
     "@babel/core" "7.2.2"
     "@babel/polyfill" "7.0.0"
@@ -3982,7 +3982,7 @@ docz-core@^0.13.4:
     "@svgr/webpack" "^4.1.0"
     art-template "^4.13.2"
     babel-loader "^8.0.2"
-    babel-preset-docz "^0.13.3"
+    babel-preset-docz "^0.13.5"
     babylon "^6.18.0"
     cache-loader "^1.2.5"
     chalk "^2.4.1"
@@ -3991,9 +3991,10 @@ docz-core@^0.13.4:
     cpy "^7.0.1"
     deepmerge "^3.0.0"
     detect-port "^1.3.0"
-    docz-utils "^0.13.3"
+    docz-utils "^0.13.5"
     dotenv "^6.2.0"
     env-dot-prop "^1.1.0"
+    express "^4.16.4"
     fast-deep-equal "^2.0.1"
     fast-glob "^2.2.4"
     file-loader "^2.0.0"
@@ -4012,8 +4013,8 @@ docz-core@^0.13.4:
     progress-estimator "^0.2.2"
     react-dev-utils "^6.1.1"
     react-docgen-typescript-loader "^3.0.0-rc.0"
-    react-hot-loader "^4.6.1"
-    rehype-docz "^0.13.3"
+    react-hot-loader "^4.6.3"
+    rehype-docz "^0.13.5"
     rehype-slug "^2.0.2"
     remark-docz "^0.13.3"
     remark-frontmatter "^1.3.1"
@@ -4024,7 +4025,7 @@ docz-core@^0.13.4:
     terser-webpack-plugin "^1.1.0"
     titleize "^1.0.1"
     url-loader "^1.1.2"
-    webpack "^4.27.1"
+    webpack "^4.28.0"
     webpack-bundle-analyzer "^3.0.3"
     webpack-chain "^5.0.1"
     webpack-dev-server "^3.1.10"
@@ -4034,16 +4035,16 @@ docz-core@^0.13.4:
     ws "^6.1.2"
     yargs "^12.0.5"
 
-docz-theme-default@^0.13.4:
-  version "0.13.4"
-  resolved "https://registry.yarnpkg.com/docz-theme-default/-/docz-theme-default-0.13.4.tgz#48b8eec28ccab2a99c192750f8bd64b6ce358ce8"
-  integrity sha512-/WNj+WoA+iGJETKL7Garl+n35QNuJaSHs+mBy3l4iBgfSEHjlwJUGfaS9ttz4/2Q+axXkYfbnw8XicVq90L4Lw==
+docz-theme-default@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/docz-theme-default/-/docz-theme-default-0.13.5.tgz#1be0839d5beb6da81132c458485125e9a2cc3e20"
+  integrity sha512-V3ZOnPNSHQQisUII5CXREZQBothSPKoL7Wd61fXjIg62Q3oxZuu7ijnp/GAaWgzNnb0zuHEt7nZAMUFs/UKjcA==
   dependencies:
     "@emotion/core" "^10.0.5"
     "@emotion/styled" "^10.0.5"
     codemirror "^5.42.0"
     copy-text-to-clipboard "^1.0.4"
-    docz "^0.13.4"
+    docz "^0.13.5"
     emotion-theming "^10.0.5"
     facepaint "^1.2.1"
     hotkeys-js "^3.4.1"
@@ -4064,10 +4065,10 @@ docz-theme-default@^0.13.4:
     react-sizes "^1.0.4"
     webfontloader "^1.6.28"
 
-docz-utils@^0.13.3:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/docz-utils/-/docz-utils-0.13.3.tgz#9a005b6eaa2b4661c0262d9f4e4a7d83034a1346"
-  integrity sha512-jTJT22JG5BePal8lBrrTPa7zGhQDBk8N1AQH1o9WcCPzKvScqgVDJQTyZut09EnONArDlHtcETtxcgZ1fCsY5Q==
+docz-utils@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/docz-utils/-/docz-utils-0.13.5.tgz#32abf4c3409af2ba604fad490573b38fdcc560a9"
+  integrity sha512-AYnbi8+sa89IuhCYEIQscZqRYnGcfVCd9hwoAGvy3oJIIHgQA6vmiT4JW5ZzUrkb0xvC47UqfihZGibIGefHhw==
   dependencies:
     "@babel/generator" "^7.2.2"
     "@babel/parser" "^7.2.2"
@@ -4075,6 +4076,7 @@ docz-utils@^0.13.3:
     codesandboxer-fs "^0.4.7"
     fs-extra "^7.0.1"
     humanize-string "^1.0.2"
+    js-string-escape "^1.0.1"
     jsx-ast-utils "^2.0.1"
     lodash.flatten "^4.4.0"
     lodash.get "^4.4.2"
@@ -4092,10 +4094,10 @@ docz-utils@^0.13.3:
     unist-util-is "^2.1.2"
     unist-util-visit "^1.4.0"
 
-docz@^0.13.4:
-  version "0.13.4"
-  resolved "https://registry.yarnpkg.com/docz/-/docz-0.13.4.tgz#d28ad865471fa72506fe53f49002e3a80a20c544"
-  integrity sha512-EyKqnDDuWW99iVksNx/XwJIuwLJum0W2fL0SpxZ3EDCnR5mF4Suz9YvU1VCFViwPx8uYpCc/FZNXSXeQsL//NQ==
+docz@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/docz/-/docz-0.13.5.tgz#a7a9e478e6a2d366d2359219beff2ab1109837eb"
+  integrity sha512-6XUY9ItqRXGF53zF7H0plEkAjeSrjKpyoA7ZygwNOf6/c2H368526rqLGZuINfW9gNUQh2sjyexdpOKvqT1xbw==
   dependencies:
     "@mdx-js/tag" "^0.16.6"
     "@sindresorhus/slugify" "^0.6.0"
@@ -4104,7 +4106,7 @@ docz@^0.13.4:
     callbag-subject "^1.0.2"
     capitalize "^2.0.0"
     deepmerge "^3.0.0"
-    docz-core "^0.13.4"
+    docz-core "^0.13.5"
     fast-deep-equal "^2.0.1"
     lodash "^4.17.11"
     prop-types "^15.6.2"
@@ -4664,7 +4666,7 @@ expect@^23.6.0:
     jest-message-util "^23.4.0"
     jest-regex-util "^23.3.0"
 
-express@^4.16.2, express@^4.16.3:
+express@^4.16.2, express@^4.16.3, express@^4.16.4:
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/express/-/express-4.16.4.tgz#fddef61926109e24c515ea97fd2f1bdbf62df12e"
   integrity sha512-j12Uuyb4FMrd/qQAm6uCHAkPtO8FDTRJZBDd5D2KOL2eLaz1yUNdUB/NOIyq0iU4q4cFarsUCrnFDPBcnksuOg==
@@ -5314,7 +5316,7 @@ global-prefix@^1.0.1:
     is-windows "^1.0.1"
     which "^1.2.14"
 
-global@^4.3.0, global@^4.3.2:
+global@^4.3.0:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/global/-/global-4.3.2.tgz#e76989268a6c74c38908b1305b10fc0e394e9d0f"
   integrity sha1-52mJJopsdMOJCLEwWxD8DjlOnQ8=
@@ -6907,6 +6909,11 @@ js-levenshtein@^1.1.3:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/js-levenshtein/-/js-levenshtein-1.1.4.tgz#3a56e3cbf589ca0081eb22cd9ba0b1290a16d26e"
   integrity sha512-PxfGzSs0ztShKrUYPIn5r0MtyAhYcCwmndozzpz8YObbPnD1jFxzlBGbRnX2mIu6Z13xN6+PTu05TQFnZFlzow==
+
+js-string-escape@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
+  integrity sha1-4mJbrbwNZ8dTPp7cEGjFh65BN+8=
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -10099,7 +10106,7 @@ react-feather@^1.1.4:
   resolved "https://registry.yarnpkg.com/react-feather/-/react-feather-1.1.4.tgz#d0143da95f9d52843cf13a553091573a7c617897"
   integrity sha512-Odke3WUl00+a2scGQKlep4m+qDESl/x+PsTRB3v6fAV/2dteF4EaRjqhX8h7HM3mU3V3v0xGTv8Z5S26bpQ5PQ==
 
-react-hot-loader@^4.6.1:
+react-hot-loader@^4.6.3:
   version "4.6.3"
   resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.6.3.tgz#d9c8923c45b35fd51538ba4297081a00be6bccb1"
   integrity sha512-FUvRO8dwbeLnc3mgLn8ARuSh8NnLBYJyiRjFn+grY/5GupSyPqv0U7ixgwXro77hwDplhm8z9wU7FlJ8kZqiAQ==
@@ -10197,10 +10204,10 @@ react-sizes@^1.0.4:
     lodash.throttle "^4.1.1"
     prop-types "^15.6.0"
 
-react-testing-library@^5.4.0:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/react-testing-library/-/react-testing-library-5.4.1.tgz#8a0757f84bf9c5111cece4e6672a486e499e3221"
-  integrity sha512-c89iIEc52A5PRKroNs7Fudx3A/eiYG2bq/1vvSi+OFnvNeIDpo726TmqwdKE2dqzGtXohl1tajcoykex/UnTAQ==
+react-testing-library@^5.4.2:
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/react-testing-library/-/react-testing-library-5.4.2.tgz#0708ccf69b0df2c726b11ca5fcc0cb190a786897"
+  integrity sha512-1F4qd2vmRxtsz6o3vXFvxZb/QiHNpmjCFUAreom5h8yYPqbGQVIwlIaeGzg/QBoHreqeKGZ4VmqgepjQtoCWeA==
   dependencies:
     dom-testing-library "^3.13.1"
 
@@ -10453,12 +10460,12 @@ regjsparser@^0.6.0:
   dependencies:
     jsesc "~0.5.0"
 
-rehype-docz@^0.13.3:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/rehype-docz/-/rehype-docz-0.13.3.tgz#2c6241d70345b7d9e9997bf4d21f405f37179372"
-  integrity sha512-Uj8A2xHsXkMdXvymeqqvYRoPk+ZynMgkjgGPh8HYE98zjI7OXwcO8UlwO2WAdM4G3zv2TQ1Wyo7/zijnwLSbbw==
+rehype-docz@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/rehype-docz/-/rehype-docz-0.13.5.tgz#358c5f66cf9ed7c7bb35e904e1491ddb17f15b44"
+  integrity sha512-X7cxuwUH9/UHTAV641+Rywfrd0Fy7WMafe9wREqwQQK6ayGc8gNKno+U8bIyGg+3OnbQFPtqYCac+HhPmQq1mg==
   dependencies:
-    docz-utils "^0.13.3"
+    docz-utils "^0.13.5"
     hast-util-to-string "^1.0.1"
     jsx-ast-utils "^2.0.1"
     lodash.flatten "^4.4.0"
@@ -10934,10 +10941,10 @@ rollup@^0.67.3:
     "@types/estree" "0.0.39"
     "@types/node" "*"
 
-rollup@^0.68.0:
-  version "0.68.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.68.0.tgz#e4fbde2e6278354962be530b498fc485298c0fc3"
-  integrity sha512-UbmntCf8QBlOqJnwsNWQCI0oonHOgs9y1OLoO8BHf2r8gCyRLp3JzLHXARJpsNDAS08Qm3LDjzyWma5sqnCxDQ==
+rollup@^0.68.2:
+  version "0.68.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.68.2.tgz#c26afb5d981ca7a1a32f76087dbde9dad4fcc653"
+  integrity sha512-WgjNCXYv7ZbtStIap1+tz4pd2zwz0XYN//OILwEY6dINIFLVizK1iWdu+ZtUURL/OKnp8Lv2w8FBds8YihzX7Q==
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "*"
@@ -12978,10 +12985,10 @@ webpack-sources@^1.1.0, webpack-sources@^1.3.0:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack@^4.27.1:
-  version "4.28.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.28.0.tgz#6bdc26c17fe4c7e28c29fa002e6d37ac92caae9e"
-  integrity sha512-gPNTMGR5ZlBucXmEQ34TRxRqXnGYq9P3t8LeP9rvhkNnr+Cn+HvZMxGuJ4Hl7zdmoRUZP+GosniqJiadXW/RqQ==
+webpack@^4.28.0:
+  version "4.28.2"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.28.2.tgz#6b534a8bc91a45787ed631dc2e87aec94e9e4db7"
+  integrity sha512-PK3uVg3/NuNVOjPfYleFI6JF7khO7c2kIlksH7mivQm+QDcwiqV1x6+q89dDeOioh5FNxJHr3LKbDu3oSAhl9g==
   dependencies:
     "@webassemblyjs/ast" "1.7.11"
     "@webassemblyjs/helper-module-context" "1.7.11"
