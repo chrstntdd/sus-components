@@ -56,7 +56,7 @@ const BackgroundImage = ({ src, critical, placeholderUi, ...props }: BackgroundI
         // TODO: handle `onerror`
       }
     },
-    [src]
+    [src, seenBefore]
   )
 
   const child = React.Children.only(props.children)

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom'
+import { Router, Link } from '@chrstntdd/router'
 
 import {
   Dropout,
@@ -7,13 +8,19 @@ import {
   DropoutList,
   DropoutOption,
   BackgroundImage,
-  ImageType,
-  Router,
-  Link,
+  SusImage,
   useToggle
 } from '../lib'
 
-export const loadScript = src => {
+const shuffle = (a: any[]) => {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+const loadScript = src => {
   const script = document.createElement('script')
   script.src = src
   document.body.appendChild(script)
@@ -32,9 +39,11 @@ const remoteImageAssets = [
   'https://images.unsplash.com/photo-1545253088-55b119d82e83?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80',
   'https://images.unsplash.com/photo-1545273920-c6a376292092?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1868&q=80',
   'https://images.unsplash.com/photo-1545256968-9b87acc4e9de?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80',
-  'https://source.unsplash.com/random/2000x1000',
-  'https://source.unsplash.com/random/3000x1000',
-  'https://source.unsplash.com/random/1000x1000'
+  'https://images.unsplash.com/photo-1545588156-bb90eb5315ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80',
+  'https://images.unsplash.com/photo-1545588058-7ef3ae3ebdf5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80',
+  'https://images.unsplash.com/photo-1545560957-53fff0503982?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+  'https://images.unsplash.com/photo-1545534384-4826fc941890?ixlib=rb-1.2.1&auto=format&fit=crop&w=934&q=80',
+  'https://images.unsplash.com/photo-1545499026-702db711b529?ixlib=rb-1.2.1&auto=format&fit=crop&w=1900&q=80'
 ]
 
 if (module.hot) {
@@ -46,10 +55,21 @@ if (module.hot) {
 const Home = () => (
   <div>
     <div className="image-container">
-      {remoteImageAssets.map((src, i) => (
-        <BackgroundImage type={ImageType.BackgroundImage} key={src} src={src} critical={i < 3}>
+      {shuffle(remoteImageAssets).map((src, i) => (
+        <BackgroundImage key={src} src={src} critical={i < 3}>
           <div />
         </BackgroundImage>
+        // <SusImage
+        //   key={src}
+        //   src={src}
+        //   critical={i < 3}
+        //   style={{
+        //     display: 'flex',
+        //     margin: '2rem',
+        //     minHeight: '600px',
+        //     minWidth: '800px'
+        //   }}
+        // />
       ))}
     </div>
   </div>
@@ -60,19 +80,25 @@ const PageTwo = () => {
 
   return (
     <div>
-      <Dropout>
-        <DropoutInput className="input" />
+      <button type="button" onClick={toggle}>
+        Mount dropout
+      </button>
 
-        <DropoutList>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((el, i) => {
-            return (
-              <DropoutOption key={el}>
-                <div>hey lol</div>
-              </DropoutOption>
-            )
-          })}
-        </DropoutList>
-      </Dropout>
+      {on && (
+        <Dropout>
+          <DropoutInput className="input" />
+
+          <DropoutList>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((el, i) => {
+              return (
+                <DropoutOption key={el}>
+                  <div>hey lol</div>
+                </DropoutOption>
+              )
+            })}
+          </DropoutList>
+        </Dropout>
+      )}
     </div>
   )
 }
