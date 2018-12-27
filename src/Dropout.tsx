@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { Portal } from './Portal'
+import observeRect from './observe-rect'
 
 /**
  * @description
@@ -40,23 +41,26 @@ const createStore = (reducer, initialState): Store => {
   return store
 }
 
+const createMachine = (chart, reducer, initialState) => {
+  let state = chart.initial
+  const { dispatch, state: data } = createStore(reducer, initialState)
+
+  const transition = (action, payload = {}) => {
+    const nextState = chart[state][action]
+    dispatch({ state, type: action, nextState: state, ...payload })
+    state = nextState
+  }
+
+  return { state, data, transition }
+}
+
 // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 let selectingWithClickNode = null
 
-const createNamedContext = (name, defaultValue = {}) => {
-  const Ctx = React.createContext(defaultValue)
-  // @ts-ignore
-  Ctx.Consumer.displayName = `${name}.Consumer`
-  // @ts-ignore
-  Ctx.Provider.displayName = `${name}.Provider`
-
-  return Ctx
-}
-
-const DropoutContext = createNamedContext('Dropout')
+const DropoutContext = React.createContext({})
 
 const wrapEvent = (handler, cb) => (event: React.SyntheticEvent) => {
   handler && handler(event)
@@ -66,14 +70,13 @@ const wrapEvent = (handler, cb) => (event: React.SyntheticEvent) => {
 
 interface DropoutListProps {
   children: React.ReactElement<any>[]
+  style?: React.CSSProperties
 }
 interface DropoutListState {
   // ...
 }
 
 class DropoutList extends React.Component<DropoutListProps, DropoutListState> {
-  static defaultProps = {}
-
   static contextType = DropoutContext
 
   constructor(props) {
@@ -99,28 +102,46 @@ class DropoutList extends React.Component<DropoutListProps, DropoutListState> {
   componentWillUnmount() {
     this.cleanup()
 
-    this.context.options.current = null
+    this.context.optionsRef.current = null
   }
 
   render() {
-    // useEffect? to update context not sure if needed with legacy react
+    if (!this.props.children) return null
 
-    // this.context.options.current = React.Children.map(
-    //   this.props.children,
-    //   ({ props: { children } }) => children
-    // )
+    const {
+      data: { navigationValue, value },
+      transition
+    } = this.context
+
+    // useEffect? to update context not sure if needed with legacy react
+    this.context.optionsRef.current = React.Children.map(
+      this.props.children,
+      ({ props: { children } }) => children
+    )
 
     const clones = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, {
-        contextValue: (this.context.data && this.context.data.value) || ''
+        transition,
+        navigationValue,
+        contextValue: value || ''
       })
     })
 
-    return (
-      <Portal>
-        <ul style={{ position: 'fixed' }}>{clones}</ul>
-      </Portal>
+    const el = this.context.rect && (
+      <ul
+        style={{
+          ...this.props.style,
+          position: 'fixed',
+          top: this.context.rect.bottom,
+          left: this.context.rect.left,
+          width: this.context.rect.width
+        }}
+      >
+        {clones}
+      </ul>
     )
+
+    return <Portal>{this.context.rect && el}</Portal>
   }
 }
 
@@ -143,12 +164,12 @@ class DropoutOption extends React.Component<DropoutOptionProps, DropoutOptionSta
    * Here we set the 'intended' target to be selected
    */
   handleMouseDown = event => {
-    this.context.dispatch({ type: 'MOUSE_DOWN' })
+    this.context.transition('MOUSE_DOWN')
 
     selectingWithClickNode = event.target
   }
   handleClick = () => {
-    this.context.dispatch({ type: 'SELECT_BY_CLICK' })
+    this.context.transition('SELECT_BY_CLICK')
   }
 
   render() {
@@ -176,10 +197,12 @@ class DropoutOption extends React.Component<DropoutOptionProps, DropoutOptionSta
       ...props
     } = this.props
 
+    const isActive = navigationValue === value
+
     return (
       <li
         {...props}
-        aria-selected={true} // TODO
+        aria-selected={isActive}
         onClick={wrapEvent(onClick, this.handleClick)}
         onMouseDown={wrapEvent(onMouseDown, this.handleMouseDown)}
       >
@@ -189,14 +212,73 @@ class DropoutOption extends React.Component<DropoutOptionProps, DropoutOptionSta
   }
 }
 
-const mainReducer = (state, action) => {
+const mainReducer = (data, action) => {
   switch (action.type) {
-    case '': {
-      return ''
-    }
-
+    case 'CHANGE':
+      return {
+        ...data,
+        navigationValue: null,
+        value: action.value
+      }
+    case 'NAVIGATE':
+      return {
+        ...data,
+        navigationValue: action.value
+      }
+    case 'CLEAR':
+      return {
+        ...data,
+        value: '',
+        navigationValue: null
+      }
+    case 'CLOSE':
+      return {
+        ...data,
+        navigationValue: null
+      }
+    case 'SELECT_WITH_CLICK':
+      return {
+        ...data,
+        value: action.value,
+        navigationValue: null
+      }
+    case 'SELECT_WITH_KEYBOARD':
+      return {
+        ...data,
+        value: data.navigationValue,
+        navigationValue: null
+      }
     default:
-      return state
+      return data
+  }
+}
+
+const stateChart = {
+  initial: 'idle',
+  idle: {
+    CLOSE: 'idle',
+    CLEAR: 'idle',
+    CHANGE: 'suggesting',
+    NAVIGATE: 'navigating'
+  },
+  suggesting: {
+    CHANGE: 'suggesting',
+    NAVIGATE: 'navigating',
+    MOUSE_DOWN: 'selectingWithClick',
+    CLEAR: 'idle',
+    CLOSE: 'idle'
+  },
+  navigating: {
+    CHANGE: 'suggesting',
+    ARROW_UP_DOWN: 'navigating',
+    MOUSE_DOWN: 'selectingWithClick',
+    CLEAR: 'idle',
+    CLOSE: 'idle',
+    NAVIGATE: 'navigating',
+    SELECT_WITH_KEYBOARD: 'idle'
+  },
+  selectingWithClick: {
+    SELECT_WITH_CLICK: 'idle'
   }
 }
 
@@ -209,16 +291,49 @@ class Dropout extends React.Component {
     super(props)
   }
 
+  observerRef: {
+    current: {
+      observe: () => void
+      unobserve: () => void
+    }
+  } = React.createRef()
+
+  state = { rect: null }
+
   // We store the values of all the Options on this ref through context on
   // render. This makes it possible to perform the keyboard navigation from
   // the input on the list.
-  options = React.createRef() // list of refs
+  options: { current: React.RefObject<any>[] } = React.createRef() // list of refs
 
-  internalState = createStore(mainReducer, {})
+  // To position the menu over the input with useRect we need to store the
+  // input ref up here.
+  inputRef: React.RefObject<HTMLInputElement> = React.createRef()
+
+  internalState = createMachine(stateChart, mainReducer, {
+    // the value the user has typed
+    value: '',
+
+    // the value the user has navigated to with the keyboard
+    navigationValue: null
+  })
+
+  componentDidMount() {
+    this.observerRef.current = observeRect(this.inputRef.current, rect => {
+      this.setState({ rect })
+    })
+
+    this.observerRef.current.observe()
+  }
+
+  componentWillUnmount() {
+    this.observerRef.current.unobserve()
+  }
 
   render() {
     const context = {
-      options: this.options,
+      rect: this.state.rect,
+      inputRef: this.inputRef,
+      optionsRef: this.options,
       ...this.internalState
     }
 
@@ -250,8 +365,6 @@ class DropoutInput extends React.Component<InputProps, InputState> {
     }
   }
 
-  inputRef: React.RefObject<HTMLInputElement> = React.createRef()
-
   handleClick = () => {
     //
   }
@@ -271,35 +384,92 @@ class DropoutInput extends React.Component<InputProps, InputState> {
     if (safeInputValue === '') {
       //
     } else {
-      this.context.dispatch({ type: 'CHANGE', value: safeInputValue })
+      this.context.transition('CHANGE', { value: safeInputValue })
       this.setState({ value: safeInputValue })
     }
   }
 
   handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const {
+      transition,
+      state,
+      data,
+      optionsRef: { current: options }
+    } = this.context
+
+    // TODO: investigate why data is not being updated
+
     switch (event.key) {
       case 'ArrowDown': {
-        // Prevent scrolling down the page
+        // Don't scroll the page
         event.preventDefault()
+
+        // No need to navigate
+        if (!options || options.length === 0) return
+
+        if (state === 'idle') {
+          // Opening a closed list, we don't want to select anything,
+          // just open it.
+          transition('NAVIGATE', { value: null })
+        } else {
+          const index = options.indexOf(data.navigationValue)
+          const atBottom = index === options.length - 1
+          if (atBottom) {
+            // Go back to the value the user has typed
+            transition('NAVIGATE', { value: null })
+          } else {
+            // Go to the next item in the list
+            const nextValue = options[(index + 1) % options.length]
+            transition('NAVIGATE', { value: nextValue })
+          }
+        }
         break
       }
-
       case 'ArrowUp': {
-        // Prevent scrolling up the page
+        // Don't scroll the page
         event.preventDefault()
 
+        // No need to navigate
+        if (!options || options.length === 0) return
+
+        if (state === 'idle') {
+          transition('NAVIGATE', { value: null })
+        } else {
+          const index = options.indexOf(data.navigationValue)
+          if (index === 0) {
+            // Go back to the value the user has typed
+            transition('NAVIGATE', { value: null })
+          } else if (index === -1) {
+            // select the last one
+            const value = options.length ? options[options.length - 1] : null
+            transition('NAVIGATE', { value })
+          } else {
+            // normal case, select previous
+            const nextValue = options[(index - 1 + options.length) % options.length]
+            transition('NAVIGATE', { value: nextValue })
+          }
+        }
         break
       }
       case 'Escape': {
+        if (state !== 'idle') transition('CLOSE')
         break
       }
-
       case 'Enter': {
+        if (state === 'navigating' && data.navigationValue !== null) {
+          // don't want to submit forms
+          event.preventDefault()
+          // onSelect && onSelect(navigationValue);
+          // not sure if we want this, if we don't do it, apps can do in
+          // `onSelect` what they do in `onChange`, but probably want to keep
+          // the old results after a selection
+          // onChange && onChange(event);
+          transition('SELECT_WITH_KEYBOARD')
+        }
         break
       }
-
-      default:
-        break
+      default: {
+      }
     }
   }
 
@@ -323,7 +493,7 @@ class DropoutInput extends React.Component<InputProps, InputState> {
 
     return (
       <input
-        ref={this.inputRef}
+        ref={this.context.inputRef}
         {...props}
         onBlur={wrapEvent(onBlur, this.handleBlur)}
         onChange={wrapEvent(onChange, this.handleChange)}

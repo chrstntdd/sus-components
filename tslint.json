@@ -5,7 +5,7 @@
     "no-increment-decrement": false,
     "no-parameter-reassignment": false,
     "prefer-template": false,
-    "no-console": true,
+    "prefer-array-literal": false,
     "function-name": [
       true,
       {

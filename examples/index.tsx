@@ -80,25 +80,18 @@ const PageTwo = () => {
 
   return (
     <div>
-      <button type="button" onClick={toggle}>
-        Mount dropout
-      </button>
+      <Dropout>
+        <DropoutInput className="input" onFocus={toggle} onBlur={toggle} />
 
-      {on && (
-        <Dropout>
-          <DropoutInput className="input" />
-
-          <DropoutList>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((el, i) => {
-              return (
-                <DropoutOption key={el}>
-                  <div>hey lol</div>
-                </DropoutOption>
-              )
-            })}
-          </DropoutList>
-        </Dropout>
-      )}
+        <DropoutList>
+          {on &&
+            [...new Array(10).keys()].map(el => (
+              <DropoutOption key={el}>
+                <div>hey lol</div>
+              </DropoutOption>
+            ))}
+        </DropoutList>
+      </Dropout>
     </div>
   )
 }

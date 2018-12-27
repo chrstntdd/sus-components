@@ -12,7 +12,7 @@
     "removeComments": true,
     "moduleResolution": "node",
     "pretty": true,
-    "target": "es5",
+    "target": "esnext",
     "typeRoots": ["./node_modules/@types"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

@@ -2,7 +2,7 @@
 
 import { join } from 'path'
 import chalk from 'chalk'
-import spawn from 'cross-spawn'
+import crossSpawn from 'cross-spawn'
 import * as ts from 'typescript'
 
 import { resolveBin, removeOldFiles, recursiveReadDir } from './utils'
@@ -47,7 +47,7 @@ const SCRIPTS: ScriptTypes = {
 
 const emitTypeDefs = async () => {
     try {
-      await spawn.spawn(
+      await crossSpawn.spawn(
         resolveBin('tsc'),
         ['--declaration', '--outDir', `${paths.lib}/types`, '--emitDeclarationOnly'],
         { stdio: 'inherit' }
@@ -57,7 +57,7 @@ const emitTypeDefs = async () => {
     }
   }
 
-  //\\
+  // \\
   // Map script type to handler
 ;(async (s: keyof ScriptTypes) => {
   // clear console
@@ -83,7 +83,7 @@ const emitTypeDefs = async () => {
 
           const [fileNameWithoutExtension] = file.split('.')
 
-          return spawn.spawn(
+          return crossSpawn.spawn(
             microBundleBin,
             [
               '-i',
@@ -161,7 +161,7 @@ const emitTypeDefs = async () => {
       await removeOldFiles(paths.lib)
       await emitTypeDefs()
 
-      await spawn.spawn(microBundleBin, sharedMicrobundleArgs, {
+      await crossSpawn.spawn(microBundleBin, sharedMicrobundleArgs, {
         stdio: 'inherit'
       })
 
@@ -175,7 +175,7 @@ const emitTypeDefs = async () => {
 
       setTimeout(() => {}, 0)
 
-      await spawn.spawn(rollupBin, [...sharedRollupArgs, '-w'], { stdio: 'inherit' })
+      await crossSpawn.spawn(rollupBin, [...sharedRollupArgs, '-w'], { stdio: 'inherit' })
 
       break
     }
