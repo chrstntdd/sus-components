@@ -1,61 +1,62 @@
 const props = ['width', 'height', 'top', 'right', 'bottom', 'left']
 
-const rectChanged = (a = {}, b = {}) => props.some(prop => a[prop] !== b[prop])
+const rectChanged = (currentRect = {}, prevRect = {}) =>
+  props.some(prop => currentRect[prop] !== prevRect[prop])
 
-const observedNodes = new Map()
 let rafId
 
+const observedNodes: Map<HTMLElement, State> = new Map()
+type Rectangle = ClientRect | DOMRect
+type State = { rect: Rectangle; callbacks: any[] }
+
 const run = () => {
-  observedNodes.forEach(state => {
-    if (state.hasRectChanged) {
-      // pass rect back to each listener
-      state.callbacks.forEach(cb => cb(state.rect))
-      state.hasRectChanged = false
+  const changedStates = []
+
+  observedNodes.forEach((state: State, node: HTMLElement) => {
+    const newRect: Rectangle = node.getBoundingClientRect()
+
+    if (rectChanged(newRect, state.rect)) {
+      state.rect = newRect
+      changedStates.push(state)
     }
   })
 
-  setTimeout(() => {
-    observedNodes.forEach((state, node) => {
-      const newRect = node.getBoundingClientRect()
-      if (rectChanged(newRect, state.rect)) {
-        state.hasRectChanged = true
-        state.rect = newRect
-      }
-    })
-  }, 0)
+  changedStates.forEach(state => {
+    state.callbacks.forEach(listener => listener(state.rect))
+  })
 
   rafId = window.requestAnimationFrame(run)
 }
 
-export default (node: HTMLElement, cb) => {
-  return {
-    observe() {
-      const wasEmpty = observedNodes.size === 0
-      if (observedNodes.has(node)) {
-        observedNodes.get(node).callbacks.push(cb)
-      } else {
-        observedNodes.set(node, {
-          rect: undefined,
-          hasRectChanged: false,
-          callbacks: [cb]
-        })
-      }
-      if (wasEmpty) run()
-    },
+export default (node: HTMLElement, callback: (state: State) => void) => ({
+  observe() {
+    const wasEmpty = observedNodes.size === 0
 
-    unobserve() {
-      const state = observedNodes.get(node)
-      if (state) {
-        // Remove the callback
-        const index = state.callbacks.indexOf(cb)
-        if (index >= 0) state.callbacks.splice(index, 1)
+    if (observedNodes.has(node)) {
+      observedNodes.get(node).callbacks.push(callback)
+    } else {
+      observedNodes.set(node, {
+        rect: undefined,
+        callbacks: [callback]
+      })
+    }
 
-        // Remove the node reference
-        if (!state.callbacks.length) observedNodes.delete(node)
+    if (wasEmpty) run()
+  },
 
-        // Stop the loop
-        if (!observedNodes.size) cancelAnimationFrame(rafId)
-      }
+  unobserve() {
+    const state = observedNodes.get(node)
+
+    if (state) {
+      // Remove the callback
+      const index = state.callbacks.indexOf(callback)
+      if (index >= 0) state.callbacks.splice(index, 1)
+
+      // Remove the node reference
+      if (!state.callbacks.length) observedNodes.delete(node)
+
+      // Stop the loop
+      if (!observedNodes.size) cancelAnimationFrame(rafId)
     }
   }
-}
+})

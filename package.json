@@ -23,6 +23,7 @@
     "lint": "tslint -c tslint.json '{src,scripts}/**/*.{ts,tsx}' -t codeFrame --fix",
     "build-lib": "./scripts/build.ts build-lib",
     "build-example": "parcel build examples/index.html",
+    "test": "jest -c ./jest.config.js --coverage true",
     "docz-dev": "docz dev",
     "docz-build": "docz build",
     "prettier": "prettier --write 'src/**/*.{ts,tsx,mdx}'"
@@ -38,6 +39,7 @@
     "cross-spawn": "^6.0.5",
     "docz": "^0.13.5",
     "docz-theme-default": "^0.13.5",
+    "dom-testing-library": "^3.16.1",
     "husky": "^1.2.1",
     "jest": "^23.6.0",
     "jest-dom": "^3.0.0",
