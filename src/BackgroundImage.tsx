@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { useIntersectionObserver } from './hooks'
+import { useAppearOnce } from './hooks'
 
 const imageCache = new Map()
 
@@ -32,8 +32,7 @@ const BackgroundImage = ({ src, critical, placeholderUi, ...props }: BackgroundI
   const [imgLoaded, setImgLoaded] = React.useState(seenBefore)
   const [imgVisible, setImgVisible] = React.useState(false)
 
-  const rootRef = useIntersectionObserver({
-    once: true,
+  const rootRef = useAppearOnce({
     onAppear: () => {
       setImgVisible(true)
       loadImage()

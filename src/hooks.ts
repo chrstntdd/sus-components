@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 
 const imageCache = new Map()
 
@@ -31,7 +31,6 @@ const useImage = (src: string, critical?: boolean, onLoad?, onError?): [boolean,
 }
 
 type IntersectionObserverProps = {
-  once: boolean
   onAppear: () => void
   options?:
     | {
@@ -42,36 +41,25 @@ type IntersectionObserverProps = {
     | {}
 }
 
-const useIntersectionObserver = ({
-  once,
+const useAppearOnce = ({
   onAppear,
   options = {}
 }: IntersectionObserverProps): React.MutableRefObject<any> => {
-  const [seenBefore, setSeenBefore] = useState(false)
   const ioRef = useRef(null)
   const targetElement = useRef(null)
 
-  const cleanup = useCallback(() => {
-    ioRef.current.unobserve(targetElement.current)
-    ioRef.current.disconnect()
-  }, [])
-
   useEffect(() => {
-    if (typeof window == 'undefined') return
+    if (typeof window === 'undefined') return
 
     ioRef.current = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting || entry.intersectionRatio > 0) {
-        if (!seenBefore) setSeenBefore(true)
-
         onAppear()
 
-        if (once) cleanup()
+        ioRef.current.disconnect()
       }
     }, options)
 
     ioRef.current.observe(targetElement.current)
-
-    return cleanup
   }, [])
 
   return targetElement
@@ -94,4 +82,4 @@ const useToggle = (initial: boolean): [boolean, () => void] => {
   return [on, toggle]
 }
 
-export { useImage, useToggle, useIntersectionObserver }
+export { useImage, useToggle, useAppearOnce }
