@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createRoot } from 'react-dom'
+import reactDom from 'react-dom'
 import { Router, Link } from '@chrstntdd/router'
 
 import {
@@ -11,6 +11,11 @@ import {
   SusImage,
   useToggle
 } from '../lib'
+
+const rando = () =>
+  Math.random()
+    .toString(32)
+    .substr(2, 6)
 
 const shuffle = (a: any[]) => {
   for (let i = a.length - 1; i > 0; i--) {
@@ -76,20 +81,20 @@ const Home = () => (
 )
 
 const PageTwo = () => {
-  const [on, toggle] = useToggle(false)
-
   return (
     <div>
       <Dropout>
-        <DropoutInput className="input" onFocus={toggle} onBlur={toggle} />
+        <DropoutInput className="input" />
 
         <DropoutList>
-          {on &&
-            [...new Array(10).keys()].map(el => (
-              <DropoutOption key={el}>
-                <div>hey lol</div>
+          {[...new Array(10).keys()].map(el => {
+            const val = `hey ${rando()}`
+            return (
+              <DropoutOption key={el} value={val}>
+                {val}
               </DropoutOption>
-            ))}
+            )
+          })}
         </DropoutList>
       </Dropout>
     </div>
@@ -115,4 +120,5 @@ const App = () => {
   }
 }
 
-createRoot(document.getElementById('root')).render(<App />)
+// reactDom.createRoot(document.getElementById('root')).render(<App />)
+reactDom.render(<App />, document.getElementById('root'))
