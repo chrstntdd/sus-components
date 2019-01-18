@@ -43,6 +43,11 @@ const SCRIPTS: ScriptTypes = {
   'build-single-lib': 'build-single-lib'
 }
 
+const rando = () =>
+  Math.random()
+    .toString(32)
+    .substr(2, 6)
+
 // \\
 
 const emitTypeDefs = async () => {
@@ -112,10 +117,11 @@ const emitTypeDefs = async () => {
       await removeOldFiles(paths.lib)
       await emitTypeDefs()
 
-      const sources = await recursiveReadDir(paths.src, /\.(ts|tsx)$/)
+      const sources = (await recursiveReadDir(paths.src, /\.(ts|tsx)$/)).filter(
+        path => !path.includes('index.')
+      )
 
       const fnSet = new Set()
-      let id = 0
 
       sources.forEach(async s => {
         const content = await asyncReadFile(s, 'UTF-8')
@@ -123,9 +129,8 @@ const emitTypeDefs = async () => {
 
         // check structure for existing name to avoid overwriting
         if (fnSet.has(fileName)) {
-          // TODO: find better mechanism for naming a transpiled file
           const [fn, extension] = fileName.split('.')
-          fileName = `${fn}${id++}.${extension}`
+          fileName = `${fn}-${rando()}.${extension}`
         }
 
         fnSet.add(fileName)

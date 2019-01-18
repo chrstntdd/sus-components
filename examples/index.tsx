@@ -120,5 +120,5 @@ const App = () => {
   }
 }
 
-// reactDom.createRoot(document.getElementById('root')).render(<App />)
-reactDom.render(<App />, document.getElementById('root'))
+reactDom.createRoot(document.getElementById('root')).render(<App />)
+// reactDom.render(<App />, document.getElementById('root'))
