@@ -39,24 +39,21 @@ const BackgroundImage = ({ src, critical, placeholderUi, ...props }: BackgroundI
     }
   })
 
-  const loadImage = React.useCallback(
-    () => {
-      if (!seenBefore) {
-        const img = new Image()
+  const loadImage = React.useCallback(() => {
+    if (!seenBefore) {
+      const img = new Image()
 
-        img.src = src
+      img.src = src
 
-        img.onload = () => {
-          imageCache.set(src, img)
+      img.onload = () => {
+        imageCache.set(src, img)
 
-          setImgLoaded(true)
-        }
-
-        // TODO: handle `onerror`
+        setImgLoaded(true)
       }
-    },
-    [src, seenBefore]
-  )
+
+      // TODO: handle `onerror`
+    }
+  }, [src, seenBefore])
 
   const child = React.Children.only(props.children)
 

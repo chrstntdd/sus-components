@@ -18,16 +18,13 @@ const Reveal = ({ children, once = false, onReveal, options = {} }: Props) => {
     ioRef.current.disconnect()
   }, [])
 
-  const handleReveal = React.useCallback(
-    () => {
-      if (!seenBefore) setSeenBefore(true)
+  const handleReveal = React.useCallback(() => {
+    if (!seenBefore) setSeenBefore(true)
 
-      onReveal()
+    onReveal()
 
-      if (once) cleanup()
-    },
-    [rootRef, seenBefore]
-  )
+    if (once) cleanup()
+  }, [rootRef, seenBefore])
 
   const handleIoUpdates = React.useCallback(
     ([entry]) => {

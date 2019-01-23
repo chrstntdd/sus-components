@@ -8,8 +8,8 @@ import {
   DropoutList,
   DropoutOption,
   BackgroundImage,
-  SusImage,
-  useToggle
+  MatchMedia,
+  useMediaQueryList
 } from '../lib'
 
 const rando = () =>
@@ -61,7 +61,7 @@ const Home = () => (
   <div>
     <div className="image-container">
       {shuffle(remoteImageAssets).map((src, i) => (
-        <BackgroundImage key={src} src={src} critical={i < 3}>
+        <BackgroundImage placeholderUi={''} key={src} src={src} critical={i < 3}>
           <div />
         </BackgroundImage>
         // <SusImage
@@ -80,7 +80,7 @@ const Home = () => (
   </div>
 )
 
-const PageTwo = () => {
+const DropoutPage = () => {
   return (
     <div>
       <Dropout>
@@ -101,17 +101,52 @@ const PageTwo = () => {
   )
 }
 
+const prettyPrint = value => JSON.stringify(value, null, 2)
+
+// ! Important to define this object outside of the component
+// ! that way it doesn't get re-created on each render of the
+// ! consuming component.
+const mql = {
+  xs: '(max-width: 575.98px)',
+  sm: '(min-width: 576px) and (max-width: 767.98px)',
+  md: '(min-width: 768px) and (max-width: 991.98px)',
+  lg: '(min-width: 992px) and (max-width: 1199.98px)',
+  xl: '(min-width: 1200px)'
+}
+
+const MatchMediaPage = () => {
+  const hook = useMediaQueryList(mql)
+
+  return (
+    <div>
+      HOOK
+      <pre>{prettyPrint(hook)}</pre>
+      <hr />
+      <MatchMedia queries={mql}>
+        {({ xs, sm, md, lg, xl }) => (
+          <div>
+            RENDER PROP
+            <pre>{prettyPrint({ xs, sm, md, lg, xl })}</pre>
+          </div>
+        )}
+      </MatchMedia>
+    </div>
+  )
+}
+
 const App = () => {
   try {
     return (
       <React.Fragment>
         <nav className="nav-links">
           <Link to="/">Home</Link>
-          <Link to="/2">2</Link>
+          <Link to="/dropout">Dropout</Link>
+          <Link to="/match-media">Match Media</Link>
         </nav>
         <Router>
           <Home path="/" />
-          <PageTwo path="/2" />
+          <DropoutPage path="/dropout" />
+          <MatchMediaPage path="/match-media" />
         </Router>
       </React.Fragment>
     )

@@ -6,26 +6,23 @@ const useImage = (src: string, critical?: boolean, onLoad?, onError?): [boolean,
   const alreadyLoaded = imageCache.has(src)
   const [imgLoaded, setImgLoaded] = useState(alreadyLoaded)
 
-  const loadImage = useCallback(
-    () => {
-      if (alreadyLoaded) return
+  const loadImage = useCallback(() => {
+    if (alreadyLoaded) return
 
-      const img = new Image()
+    const img = new Image()
 
-      img.src = src
+    img.src = src
 
-      img.onload = () => {
-        imageCache.set(src, src)
+    img.onload = () => {
+      imageCache.set(src, src)
 
-        onLoad && onLoad(img)
-      }
+      onLoad && onLoad(img)
+    }
 
-      img.onerror = () => {
-        onError && onError(img)
-      }
-    },
-    [src]
-  )
+    img.onerror = () => {
+      onError && onError(img)
+    }
+  }, [src])
 
   return [alreadyLoaded, loadImage]
 }
@@ -72,12 +69,9 @@ const useAppearOnce = ({
 const useToggle = (initial: boolean): [boolean, () => void] => {
   const [on, setOn] = useState(initial)
 
-  const toggle = useCallback(
-    () => {
-      setOn(!on)
-    },
-    [on]
-  )
+  const toggle = useCallback(() => {
+    setOn(!on)
+  }, [on])
 
   return [on, toggle]
 }
