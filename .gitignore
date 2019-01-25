@@ -3,6 +3,7 @@ coverage
 dist
 build
 lib
+compiled
 
 .rts2_cache_cjs
 .rts2_cache_esm

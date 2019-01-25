@@ -1,6 +1,6 @@
 {
   "name": "sus-components",
-  "version": "0.0.2",
+  "version": "0.0.2rc0",
   "author": "Christian Todd <christian.todd7@gmail.com> (https://www.chrstntdd.com/)",
   "license": "MIT",
   "main": "lib/index.js",
@@ -9,8 +9,7 @@
   "types": "lib/types",
   "sideEffects": false,
   "files": [
-    "lib",
-    "src"
+    "lib"
   ],
   "description": "Components, hooks, and helpers for react@next",
   "repository": {
@@ -24,7 +23,8 @@
     "build-lib": "./scripts/build.ts build-lib",
     "use": "parcel serve examples/index.html",
     "test": "jest -c ./jest.config.js --coverage true",
-    "prettier": "prettier --write 'src/**/*.{ts,tsx,mdx}'"
+    "prettier": "prettier --write 'src/**/*.{ts,tsx}'",
+    "pub-check": "yarn build-lib && prettier --write 'lib/**/*.{js,mjs}' && npm pack --dry"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
