@@ -61,7 +61,7 @@ const Home = () => (
   <div>
     <div className="image-container">
       {shuffle(remoteImageAssets).map((src, i) => (
-        <BackgroundImage placeholderUi={''} key={src} src={src} critical={i < 3}>
+        <BackgroundImage key={src} src={src} critical={i < 3}>
           <div />
         </BackgroundImage>
         // <SusImage

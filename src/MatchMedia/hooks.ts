@@ -1,4 +1,4 @@
-import react, { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 import { addMediaQueryListener } from './dom'
 import {
@@ -36,10 +36,6 @@ const useMediaQueryList = (queries: MediaQueryBag) => {
       unsubscribe([...unsubscribeMap.current.keys()])
     }
   }, [])
-
-  useEffect(() => {
-    console.log('new entires')
-  }, [queries])
 
   const subscribe = (entries: MediaQueryEntry[]): void => {
     for (const [alias, query] of entries) {

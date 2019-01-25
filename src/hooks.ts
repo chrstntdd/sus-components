@@ -28,33 +28,26 @@ const useImage = (src: string, critical?: boolean, onLoad?, onError?): [boolean,
 }
 
 type IntersectionObserverProps = {
-  onAppear: () => void
-  options?:
-    | {
-        root: HTMLElement
-        rootMargin: any
-        threshold: number | number[]
-      }
-    | {}
+  root: HTMLElement
+  rootMargin: any
+  threshold: number | number[]
 }
 
-const useAppearOnce = ({
-  onAppear,
-  options = {}
-}: IntersectionObserverProps): React.MutableRefObject<any> => {
+const useAppearOnce = (
+  onAppear: () => void,
+  options?: IntersectionObserverProps
+): React.MutableRefObject<any> => {
   const ioRef = useRef(null)
   const targetElement = useRef(null)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
     ioRef.current = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting || entry.intersectionRatio > 0) {
         onAppear()
 
         ioRef.current.disconnect()
       }
-    }, options)
+    }, options || {})
 
     ioRef.current.observe(targetElement.current)
   }, [])

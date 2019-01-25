@@ -38,10 +38,8 @@ const SusImage = ({ src, critical, placeholderUi, style }: SusImageProps) => {
   const [imgLoaded, setImgLoaded] = React.useState(seenBefore)
   const [imgVisible, setImgVisible] = React.useState(false)
 
-  const rootRef = useAppearOnce({
-    onAppear: () => {
-      setImgVisible(true)
-    }
+  const rootRef = useAppearOnce(() => {
+    setImgVisible(true)
   })
 
   const handleImageLoad = React.useCallback(

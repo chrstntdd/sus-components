@@ -1,5 +1,6 @@
-import * as React from 'react'
-import * as dom from './dom'
+import react, { Component } from 'react'
+
+import { addMediaQueryListener } from './dom'
 import {
   Dictionary,
   MediaQuery,
@@ -24,7 +25,7 @@ interface State {
   queries: Dictionary<boolean>
 }
 
-export class MatchMedia extends React.Component<Props, State> {
+export class MatchMedia extends Component<Props, State> {
   unsubscribeMap: Map<MediaQueryAlias, MediaQueryUnsubscribeFn> = new Map()
 
   state: State = {
@@ -43,7 +44,7 @@ export class MatchMedia extends React.Component<Props, State> {
 
   subscribe(entries: MediaQueryEntry[]): void {
     for (const [alias, query] of entries) {
-      const unsubscribeFn = dom.addMediaQueryListener(query, mql => {
+      const unsubscribeFn = addMediaQueryListener(query, mql => {
         this.setState(({ queries }) => ({
           queries: {
             ...queries,

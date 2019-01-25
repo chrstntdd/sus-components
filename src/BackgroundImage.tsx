@@ -2,19 +2,13 @@ import * as React from 'react'
 
 import { useAppearOnce } from './hooks'
 
-const imageCache = new Map()
+const imageCache = {}
 
 const DefaultPlaceholder = ({ imageIsReady }) => (
-  <div className={`default-placeholder ${!imageIsReady ? 'flicker' : ''}`} />
+  <div className={`default-placeholder ${!imageIsReady ? 'flicker' : 'fadeIn'}`} />
 )
 
-/**
- * @description
- * For background images. The child element will
- * have the `backgroundImage: url()` cloned onto
- * its style prop
- */
-type BackgroundImageProps = {
+interface BackgroundImageProps {
   src: string
   placeholderUi?: React.ReactElement<any>
   critical?: boolean
@@ -23,37 +17,27 @@ type BackgroundImageProps = {
   children: React.ReactElement<any>
 }
 
-/**
- * @description
- * Main `<Image />` component to handle all cases.
- */
-const BackgroundImage = ({ src, critical, placeholderUi, ...props }: BackgroundImageProps) => {
-  const seenBefore = React.useMemo(() => imageCache.has(src), [src])
-  const [imgLoaded, setImgLoaded] = React.useState(seenBefore)
+function BackgroundImage({ src, critical, placeholderUi, ...props }: BackgroundImageProps) {
+  const [imgLoaded, setImgLoaded] = React.useState(() => !!imageCache[src])
   const [imgVisible, setImgVisible] = React.useState(false)
 
-  const rootRef = useAppearOnce({
-    onAppear: () => {
-      setImgVisible(true)
+  const rootRef = useAppearOnce(() => {
+    if (!critical || !imgLoaded) {
       loadImage()
+      setImgVisible(true)
     }
   })
 
-  const loadImage = React.useCallback(() => {
-    if (!seenBefore) {
+  const loadImage = () => {
+    if (!imgLoaded) {
       const img = new Image()
-
       img.src = src
-
       img.onload = () => {
-        imageCache.set(src, img)
-
         setImgLoaded(true)
+        imageCache[src] = img
       }
-
-      // TODO: handle `onerror`
     }
-  }, [src, seenBefore])
+  }
 
   const child = React.Children.only(props.children)
 
@@ -61,9 +45,9 @@ const BackgroundImage = ({ src, critical, placeholderUi, ...props }: BackgroundI
     className: `${child.props.className || ''} lazy-img`
   }
 
-  const imgData = imageCache.get(src)
+  const imgData = imageCache[src]
 
-  const imageIsReady = (imgVisible || critical) && imgLoaded
+  const imageIsReady = (critical || imgVisible) && imgLoaded
 
   const clone = React.cloneElement(child, {
     ...(imageIsReady
