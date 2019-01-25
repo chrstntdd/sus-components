@@ -1,6 +1,6 @@
 {
   "name": "sus-components",
-  "version": "0.0.2rc0",
+  "version": "0.0.3",
   "author": "Christian Todd <christian.todd7@gmail.com> (https://www.chrstntdd.com/)",
   "license": "MIT",
   "main": "lib/index.js",
