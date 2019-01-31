@@ -1,0 +1,19 @@
+// This is mainly for having proper transforms available for jest
+{
+  "env": {
+    "test": {
+      "plugins": ["dynamic-import-node", "@babel/plugin-proposal-class-properties"],
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "presets": ["@babel/typescript", "@babel/react"]
+}

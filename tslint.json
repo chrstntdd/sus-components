@@ -5,6 +5,7 @@
     "no-increment-decrement": false,
     "no-parameter-reassignment": false,
     "prefer-template": false,
+    "object-shorthand-properties-first": false,
     "prefer-array-literal": false,
     "function-name": [
       true,

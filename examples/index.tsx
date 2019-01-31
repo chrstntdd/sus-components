@@ -143,11 +143,13 @@ const App = () => {
           <Link to="/dropout">Dropout</Link>
           <Link to="/match-media">Match Media</Link>
         </nav>
-        <Router>
-          <Home path="/" />
-          <DropoutPage path="/dropout" />
-          <MatchMediaPage path="/match-media" />
-        </Router>
+        <main>
+          <Router>
+            <Home path="/" />
+            <DropoutPage path="/dropout" />
+            <MatchMediaPage path="/match-media" />
+          </Router>
+        </main>
       </React.Fragment>
     )
   } catch (error) {

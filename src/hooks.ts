@@ -1,32 +1,5 @@
 import { useCallback, useState, useEffect, useRef } from 'react'
 
-const imageCache = new Map()
-
-const useImage = (src: string, critical?: boolean, onLoad?, onError?): [boolean, () => void] => {
-  const alreadyLoaded = imageCache.has(src)
-  const [imgLoaded, setImgLoaded] = useState(alreadyLoaded)
-
-  const loadImage = useCallback(() => {
-    if (alreadyLoaded) return
-
-    const img = new Image()
-
-    img.src = src
-
-    img.onload = () => {
-      imageCache.set(src, src)
-
-      onLoad && onLoad(img)
-    }
-
-    img.onerror = () => {
-      onError && onError(img)
-    }
-  }, [src])
-
-  return [alreadyLoaded, loadImage]
-}
-
 type IntersectionObserverProps = {
   root: HTMLElement
   rootMargin: any
@@ -55,10 +28,6 @@ const useAppearOnce = (
   return targetElement
 }
 
-/**
- * @description
- * Simple toggle hook
- */
 const useToggle = (initial: boolean): [boolean, () => void] => {
   const [on, setOn] = useState(initial)
 
@@ -69,4 +38,4 @@ const useToggle = (initial: boolean): [boolean, () => void] => {
   return [on, toggle]
 }
 
-export { useImage, useToggle, useAppearOnce }
+export { useToggle, useAppearOnce }
