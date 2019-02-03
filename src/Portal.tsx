@@ -4,40 +4,31 @@ import { createPortal } from 'react-dom'
 interface PortalProps {
   type?: keyof HTMLElementTagNameMap
 }
-interface PortalState {}
 
 /**
  * @description
  * To render an element and child into a portal — outside of
  * the normal flow of the document.
  */
-class Portal extends React.Component<PortalProps, PortalState> {
-  constructor(props) {
-    super(props)
-  }
-
-  childNode: any
-
-  cleanup: () => void
-
-  componentDidMount() {
-    this.childNode = document.createElement(this.props.type || 'portal')
-
-    document.body.appendChild(this.childNode)
-
-    this.cleanup = () => {
-      document.body.removeChild(this.childNode)
-    }
-
-    this.forceUpdate() // flush createElement + appendChild updates
-  }
+class Portal extends React.Component<PortalProps> {
+  defaultNode: HTMLElement | HTMLDivElement
 
   componentWillUnmount() {
-    this.cleanup()
+    if (this.defaultNode) {
+      document.body.removeChild(this.defaultNode)
+    }
+    this.defaultNode = null
   }
 
   render() {
-    return this.childNode ? createPortal(this.props.children, this.childNode) : null
+    if (typeof window === 'undefined') return null
+
+    if (!this.defaultNode) {
+      this.defaultNode = document.createElement(this.props.type || 'div')
+      document.body.appendChild(this.defaultNode)
+    }
+
+    return createPortal(this.props.children, this.defaultNode)
   }
 }
 
