@@ -45,15 +45,15 @@
     "cross-spawn": "^6.0.5",
     "dom-testing-library": "^3.16.3",
     "husky": "^1.2.1",
-    "jest": "^24.0.0",
+    "jest": "^24.1.0",
     "jest-dom": "^3.0.1",
     "jest-watch-typeahead": "^0.2.1",
     "lint-staged": "^8.1.0",
     "microbundle": "^0.9.0",
     "parcel": "^1.11.0",
     "prettier": "^1.16.4",
-    "react": "16.8.0",
-    "react-dom": "16.8.0",
+    "react": "16.8.1",
+    "react-dom": "16.8.1",
     "react-testing-library": "^5.5.3",
     "rollup": "^1.1.2",
     "rollup-plugin-node-resolve": "^4.0.0",
@@ -69,7 +69,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged && yarn test-fast"
     }
   },
   "lint-staged": {

@@ -7,6 +7,7 @@
     "prefer-template": false,
     "object-shorthand-properties-first": false,
     "prefer-array-literal": false,
+    "import-name": false,
     "function-name": [
       true,
       {
