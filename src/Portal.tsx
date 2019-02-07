@@ -10,26 +10,23 @@ interface PortalProps {
  * To render an element and child into a portal — outside of
  * the normal flow of the document.
  */
-class Portal extends React.Component<PortalProps> {
-  defaultNode: HTMLElement | HTMLDivElement
+const Portal: React.FC<PortalProps> = ({ type, children }) => {
+  const node = React.useRef(null)
 
-  componentWillUnmount() {
-    if (this.defaultNode) {
-      document.body.removeChild(this.defaultNode)
-    }
-    this.defaultNode = null
-  }
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
 
-  render() {
-    if (typeof window === 'undefined') return null
-
-    if (!this.defaultNode) {
-      this.defaultNode = document.createElement(this.props.type || 'div')
-      document.body.appendChild(this.defaultNode)
+    if (!node.current) {
+      node.current = document.createElement(type || 'div')
+      document.body.appendChild(node.current)
     }
 
-    return createPortal(this.props.children, this.defaultNode)
-  }
+    return () => {
+      document.body.removeChild(node.current)
+    }
+  }, [])
+
+  return node.current && createPortal(children, node.current)
 }
 
 export { Portal }

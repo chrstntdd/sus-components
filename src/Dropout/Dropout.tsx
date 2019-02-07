@@ -25,7 +25,8 @@ const stateChart = {
     CLEAR: 'idle',
     CLOSE: 'idle',
     NAVIGATE: 'navigating',
-    SELECT_WITH_KEYBOARD: 'idle'
+    SELECT_WITH_KEYBOARD: 'idle',
+    SELECT_WITH_CLICK: 'idle'
   },
   selectingWithClick: {
     SELECT_WITH_CLICK: 'idle'
@@ -191,27 +192,11 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
 
   context!: React.ContextType<typeof DropoutContext>
 
-  selectOnClickRef: boolean
-
-  handleClick = () => {
-    if (this.selectOnClickRef) {
-      this.selectOnClickRef = false
-      this.context.inputRef.current.select()
-    }
-  }
-
-  handleFocus = () => {
-    if (this.props.selectOnClick) {
-      this.selectOnClickRef = true
-    }
-  }
-
   handleBlur = () => {
     const { finiteState, dispatch } = this.context
 
-    if (finiteState !== 'selectingWithClick') {
-      dispatch({ type: 'CLOSE' })
-    }
+    /* istanbul ignore else */
+    if (finiteState !== 'selectingWithClick') dispatch({ type: 'CLOSE' })
   }
 
   handleChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -239,6 +224,7 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
         event.preventDefault()
 
         // No need to navigate
+        /* istanbul ignore if */
         if (!options || options.length === 0) return
 
         if (finiteState === 'idle') {
@@ -264,6 +250,7 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
         event.preventDefault()
 
         // No need to navigate
+        /* istanbul ignore if */
         if (!options || options.length === 0) return
 
         if (finiteState === 'idle') {
@@ -286,10 +273,12 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
         break
 
       case 'Escape':
+        /* istanbul ignore else */
         if (finiteState !== 'idle') dispatch({ type: 'CLOSE' })
         break
 
       case 'Enter':
+        /* istanbul ignore else */
         if (finiteState === 'navigating' && navigationValue !== null) {
           // don't want to submit forms
           event.preventDefault()
@@ -297,6 +286,7 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
         }
         break
 
+      /* istanbul ignore next */
       default:
     }
   }
@@ -329,8 +319,6 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
         value={inputValue}
         onBlur={wrapEvent(onBlur, this.handleBlur)}
         onChange={wrapEvent(onChange, this.handleChange)}
-        onClick={wrapEvent(onClick, this.handleClick)}
-        onFocus={wrapEvent(onFocus, this.handleFocus)}
         onKeyDown={wrapEvent(onKeyDown, this.handleKeyDown)}
       />
     )
@@ -354,6 +342,11 @@ class DropoutList extends React.PureComponent<DropoutListProps, {}> {
   cleanup: () => void
 
   componentDidMount() {
+    /**
+     * @description
+     * To track if a user were to mouseDown on an item, hold, then release the
+     * click outside of the dropdown items.
+     */
     const mouseUpHandler = (event: MouseEvent) => {
       if (selectingWithClickNode && selectingWithClickNode !== event.target) {
         selectingWithClickNode = null
@@ -425,6 +418,11 @@ class DropoutOption extends React.Component<DropoutOptionProps & ImplicitContext
    * Here we set the 'intended' target to be selected
    */
   handleMouseDown = event => {
+    // This prevents the activeElement from being changed
+    // to the item so it can remain with the current activeElement
+    // which is a more common use case.
+    event.preventDefault()
+
     selectingWithClickNode = event.target
     this.props.dispatch({ type: 'MOUSE_DOWN' })
   }

@@ -8,16 +8,21 @@ jest.mock('@/Portal', () => ({
   Portal: ({ children }) => <div>{children}</div>
 }))
 
-const setup = (itemCount: number) => (
+const makeArr = (n: number) => [...new Array(n).keys()]
+
+const setup = (itemCount: number, inputProps = {}) => (
   <Dropout>
-    <DropoutInput className="input" data-testid="DropoutInput" />
+    <DropoutInput className="input" data-testid="DropoutInput" {...inputProps} />
 
     <DropoutList>
-      {[...new Array(itemCount).keys()].map(el => (
-        <DropoutOption data-testid={`option-${el}`} key={el} value={el.toString()}>
-          {el}
-        </DropoutOption>
-      ))}
+      {makeArr(itemCount).map(el => {
+        const id = `option-${el}`
+        return (
+          <DropoutOption data-testid={id} key={el} value={id}>
+            <span>{el}</span>
+          </DropoutOption>
+        )
+      })}
     </DropoutList>
   </Dropout>
 )
@@ -42,7 +47,7 @@ describe('Dropout Component', () => {
     expect(container).toMatchInlineSnapshot(initialView)
   })
 
-  describe('keyboard navigation', () => {
+  describe('keyboard interactions', () => {
     it('should **ONLY** open the dropdown, but not select an item on the first ArrowDown', () => {
       const { getByTestId } = render(setup(5))
 
@@ -52,19 +57,253 @@ describe('Dropout Component', () => {
       fireEvent.keyDown(input, { key: 'ArrowDown' })
 
       // \\
-      ;[0, 1, 2, 3, 4].forEach(i => {
+      makeArr(5).forEach(i => {
         expect(getByTestId(`option-${i}`)).toBeInTheDocument()
       })
     })
 
-    test.todo('should loop through the items when during repeated ArrowDowns')
+    it('should loop through the items when during repeated ArrowDowns', () => {
+      const { getByTestId } = render(setup(5))
 
-    test.todo('should loop through the items when during repeated ArrowUps')
+      const input = getByTestId('DropoutInput')
 
-    test.todo('should return focus back to the input after the last item in the dropdown')
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
 
-    test.todo(
-      'should return focus back to the input and hide the dropdown items when the escape key is pressed'
-    )
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      // Arrow down to the last item
+      makeArr(5).forEach(i => {
+        fireEvent.keyDown(input, { key: 'ArrowDown' })
+      })
+      expect(getByTestId(`option-4`)).toHaveAttribute('aria-selected', 'true')
+
+      // Loop back to the input, if there is one, don't select the first item
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+      expect(getByTestId(`option-0`)).not.toHaveAttribute('aria-selected', 'true')
+
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+      expect(getByTestId(`option-0`)).toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('should loop through the items when during repeated ArrowUps', () => {
+      const { getByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      // Open the dropdown, don't select anything
+      fireEvent.keyDown(input, { key: 'ArrowUp' })
+
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      // Arrow up to the last item
+      fireEvent.keyDown(input, { key: 'ArrowUp' })
+
+      expect(getByTestId(`option-4`)).toHaveAttribute('aria-selected', 'true')
+
+      // // Loop back to the input, if there is one
+      makeArr(5).forEach(i => {
+        fireEvent.keyDown(input, { key: 'ArrowUp' })
+      })
+      expect(getByTestId(`option-0`)).not.toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('should hide the dropdown items when the escape key is pressed', () => {
+      const { getByTestId, queryByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      fireEvent.keyDown(input, { key: 'Escape' })
+
+      makeArr(5).forEach(i => {
+        expect(queryByTestId(`option-${i}`)).not.toBeInTheDocument()
+      })
+    })
+
+    it('should select the active item in the dropdown when the Enter key is pressed', () => {
+      const { getByTestId, queryByTestId, getByValue } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      // Select first item
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      makeArr(5).forEach(i => {
+        expect(queryByTestId(`option-${i}`)).not.toBeInTheDocument()
+      })
+
+      expect(getByValue('option-0')).toBeInTheDocument()
+    })
+  })
+
+  describe('pointer interactions', () => {
+    const selectItem = node => {
+      fireEvent.mouseDown(node)
+      fireEvent.click(node)
+    }
+
+    it('should set the input value to the selected item in the dropdown', () => {
+      const { getByTestId, getByValue, queryByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      selectItem(getByTestId('option-0'))
+
+      expect(getByValue('option-0')).toBeInTheDocument()
+    })
+
+    it('should collapse the input when an item is selected', () => {
+      const { getByTestId, getByValue, queryByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      selectItem(getByTestId('option-0'))
+
+      expect(getByValue('option-0')).toBeInTheDocument()
+      makeArr(5).forEach(i => {
+        expect(queryByTestId(`option-${i}`)).not.toBeInTheDocument()
+      })
+    })
+
+    it('should collapse the input a mouse up event happens outside of the list', () => {
+      const { getByTestId, queryByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      fireEvent.mouseUp(document.body)
+
+      makeArr(5).forEach(i => {
+        expect(queryByTestId(`option-${i}`)).not.toBeInTheDocument()
+      })
+    })
+
+    it('should keep the dropdown open when clicking on the input', () => {
+      const { getByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+      fireEvent.click(input)
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('DropoutInput', () => {
+    it('should have a functioning input', () => {
+      const { getByTestId, getByValue } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.change(input, { target: { value: 'test string' } })
+
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      expect(getByValue('test string')).toBeInTheDocument()
+    })
+
+    it('should update the input value with the value of the item navigated to with the keyboard', () => {
+      const { getByTestId, getByValue } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.change(input, { target: { value: 'test string' } })
+
+      // Dropdown it open, select the first item
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      expect(getByValue('option-0')).toBeInTheDocument()
+    })
+
+    it('should clear the items in the dropdown when the input value is empty ("")', () => {
+      const { getByTestId, getByValue, queryByValue } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+      fireEvent.change(input, { target: { value: 'test string' } })
+
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      expect(getByValue('test string')).toBeInTheDocument()
+      fireEvent.change(input, { target: { value: '' } })
+      expect(queryByValue('test string')).not.toBeInTheDocument()
+    })
+
+    it('should close the dropdown when the input is blurred', () => {
+      const { getByTestId, queryByTestId } = render(setup(5))
+
+      const input = getByTestId('DropoutInput')
+
+      fireEvent.focus(input)
+
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+      // \\
+      makeArr(5).forEach(i => {
+        expect(getByTestId(`option-${i}`)).toBeInTheDocument()
+      })
+
+      fireEvent.blur(input)
+
+      makeArr(5).forEach(i => {
+        expect(queryByTestId(`option-${i}`)).not.toBeInTheDocument()
+      })
+    })
   })
 })

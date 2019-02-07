@@ -84,7 +84,7 @@ const DropoutPage = () => {
   return (
     <div>
       <Dropout>
-        <DropoutInput className="input" />
+        <DropoutInput className="input" selectOnClick={true} />
 
         <DropoutList>
           {[...new Array(10).keys()].map(el => {
@@ -157,5 +157,5 @@ const App = () => {
   }
 }
 
-reactDom.createRoot(document.getElementById('root')).render(<App />)
-// reactDom.render(<App />, document.getElementById('root'))
+ReactDom.unstable_createRoot(document.getElementById('root')).render(<App />)
+// ReactDom.render(<App />, document.getElementById('root'))
