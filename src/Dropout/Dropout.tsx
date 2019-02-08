@@ -1,127 +1,13 @@
 import * as React from 'react'
 
 import { Portal } from '../Portal'
-import { wrapEvent, measureElements } from './helpers'
-
-const stateChart = {
-  initial: 'idle',
-  idle: {
-    CLOSE: 'idle',
-    CLEAR: 'idle',
-    CHANGE: 'suggesting',
-    NAVIGATE: 'navigating'
-  },
-  suggesting: {
-    CHANGE: 'suggesting',
-    NAVIGATE: 'navigating',
-    MOUSE_DOWN: 'selectingWithClick',
-    CLEAR: 'idle',
-    CLOSE: 'idle'
-  },
-  navigating: {
-    CHANGE: 'suggesting',
-    ARROW_UP_DOWN: 'navigating',
-    MOUSE_DOWN: 'selectingWithClick',
-    CLEAR: 'idle',
-    CLOSE: 'idle',
-    NAVIGATE: 'navigating',
-    SELECT_WITH_KEYBOARD: 'idle',
-    SELECT_WITH_CLICK: 'idle'
-  },
-  selectingWithClick: {
-    SELECT_WITH_CLICK: 'idle'
-  }
-}
-
-// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+import { dropoutReducer, stateChart, wrapEvent, measureElements } from './shared'
 
 // @ts-ignore
 const DropoutContext: React.Context<DropoutState> = React.createContext()
 
-type FiniteDropoutStates = 'initial' | 'idle' | 'suggesting' | 'navigating' | 'selectingWithClick'
-
-type DropoutAction =
-  | { type: 'CLOSE' }
-  | { type: 'CLEAR' }
-  | { type: 'MOUSE_DOWN' }
-  | { type: 'SELECT_WITH_KEYBOARD' }
-  | { type: 'CHANGE'; value: string }
-  | { type: 'NAVIGATE'; value: string }
-  | { type: 'SELECT_WITH_CLICK'; value: string }
-
-interface DropoutState {
-  rect: ClientRect | DOMRect
-  optionsRef: React.MutableRefObject<any[]>
-  finiteState: FiniteDropoutStates
-  inputRef: React.MutableRefObject<HTMLInputElement>
-  /* the value that the user has typed */
-  value: string
-  /* the value the user has navigated to with the keyboard */
-  navigationValue: null | string
-  dispatch: (action: DropoutAction) => void
-}
-
-type ImplicitContext = Pick<DropoutState, 'navigationValue' | 'dispatch'> & { contextValue: string }
-
 interface DropoutProps {
   children: React.ReactElement<any>[]
-}
-
-const dropoutReducer = (state: Readonly<DropoutState>, action: DropoutAction): DropoutState => {
-  const nextFiniteState: FiniteDropoutStates = stateChart[state.finiteState][action.type]
-
-  switch (action.type) {
-    case 'CLOSE':
-      return {
-        ...state,
-        navigationValue: null,
-        finiteState: nextFiniteState
-      }
-
-    case 'CLEAR':
-      return {
-        ...state,
-        value: '',
-        navigationValue: null,
-        finiteState: nextFiniteState
-      }
-
-    case 'CHANGE':
-      return {
-        ...state,
-        value: action.value,
-        navigationValue: null,
-        finiteState: nextFiniteState
-      }
-
-    case 'NAVIGATE':
-      return {
-        ...state,
-        navigationValue: action.value,
-        finiteState: nextFiniteState
-      }
-
-    case 'SELECT_WITH_CLICK':
-      return {
-        ...state,
-        value: action.value,
-        navigationValue: null,
-        finiteState: nextFiniteState
-      }
-
-    case 'SELECT_WITH_KEYBOARD':
-      return {
-        ...state,
-        value: state.navigationValue,
-        navigationValue: null,
-        finiteState: nextFiniteState
-      }
-
-    default:
-      return state
-  }
 }
 
 /**
@@ -315,6 +201,7 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
         ref={this.context.inputRef}
         aria-autocomplete="list"
         aria-label="TODO"
+        data-dropoutinput
         {...props}
         value={inputValue}
         onBlur={wrapEvent(onBlur, this.handleBlur)}
@@ -389,9 +276,8 @@ class DropoutList extends React.PureComponent<DropoutListProps, {}> {
       <ul
         role="listbox"
         aria-label="TODO"
+        data-dropoutmenu
         style={{
-          ...style,
-          position: 'fixed',
           top: rect.bottom,
           left: rect.left,
           width: rect.width
@@ -413,6 +299,15 @@ interface DropoutOptionProps {
 }
 
 class DropoutOption extends React.Component<DropoutOptionProps & ImplicitContext> {
+  shouldComponentUpdate(nextProps) {
+    const wasActive = this.props.navigationValue === this.props.value
+    const isActive = nextProps.navigationValue === nextProps.value
+    if (wasActive !== isActive) {
+      return true
+    }
+    return false
+  }
+
   /**
    * @description
    * Here we set the 'intended' target to be selected
@@ -455,7 +350,7 @@ class DropoutOption extends React.Component<DropoutOptionProps & ImplicitContext
     return (
       <li
         {...props}
-        style={{ backgroundColor: isActive ? 'lightGray' : 'transparent' }}
+        data-dropoutitem
         aria-selected={isActive}
         onClick={wrapEvent(onClick, this.handleClick)}
         onMouseDown={wrapEvent(onMouseDown, this.handleMouseDown)}

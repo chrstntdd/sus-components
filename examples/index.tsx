@@ -12,10 +12,7 @@ import {
   useMediaQueryList
 } from '../lib'
 
-const rando = () =>
-  Math.random()
-    .toString(32)
-    .substr(2, 6)
+import { randomEmoji } from '../src/random'
 
 const shuffle = (a: any[]) => {
   for (let i = a.length - 1; i > 0; i--) {
@@ -80,18 +77,45 @@ const Home = () => (
   </div>
 )
 
+const Thing = ({ children }) => <div>{children}</div>
+
+function* fibonacci() {
+  let fn1 = 0
+  let fn2 = 1
+  while (true) {
+    const current = fn1
+    fn1 = fn2
+    fn2 = current + fn1
+    yield current
+  }
+}
+
+function* enumerate(it, start?: number) {
+  start = start || 0
+  for (const x of it) {
+    yield [start++, x]
+  }
+}
+
+const items = []
+
+for (const [_, x] of enumerate(fibonacci())) {
+  if (x > 10e20) break
+  items.push(x)
+}
+
 const DropoutPage = () => {
   return (
-    <div>
+    <div className="dropout-page">
       <Dropout>
         <DropoutInput className="input" selectOnClick={true} />
 
         <DropoutList>
-          {[...new Array(10).keys()].map(el => {
-            const val = `hey ${rando()}`
+          {items.map((el, i) => {
+            const val = `${randomEmoji()}${el}`
             return (
-              <DropoutOption key={el} value={val}>
-                {val}
+              <DropoutOption key={i} value={val}>
+                <Thing>{val}</Thing>
               </DropoutOption>
             )
           })}

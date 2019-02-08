@@ -10,12 +10,42 @@
   }
 }
 
-.input {
-  border: 1px solid seagreen;
+.dropout-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+}
+
+[data-dropoutinput] {
   padding: 0.8rem;
+  width: 16rem;
+  margin: 8rem;
+}
+
+[data-dropoutitem] {
+  padding: 0.6rem;
+  cursor: pointer;
+
+  &[aria-selected='true'],
+  &:hover {
+    background-color: lightgray;
+  }
+
+  &:not([aria-selected]) {
+    background-color: transparent;
+  }
+}
+
+[data-dropoutmenu] {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
   position: absolute;
-  top: 50%;
-  left: 50%;
+  outline: 1px solid grey;
+  max-height: 26rem;
+  overflow-y: scroll;
 }
 
 // Keep image opacity at 0 until it's ready ad the .fadeIn class is added

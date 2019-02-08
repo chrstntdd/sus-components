@@ -52,7 +52,7 @@ const removeOldFiles = async (dir: string) => {
   try {
     await spawn.sync('rm', ['-rf', dir], { stdio: 'inherit' })
 
-    process.stdout.write(`🧼  Cleaned out all them old files from ${directoryLabel} 🧽\n`)
+    process.stdout.write(`✨ Cleaned out all them old files from ${directoryLabel} ✨\n`)
   } catch (error) {
     process.stdout.write('Unable to remove old files')
   }

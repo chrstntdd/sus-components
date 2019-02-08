@@ -33,6 +33,7 @@ const initialView = `
     aria-autocomplete="list"
     aria-label="TODO"
     class="input"
+    data-dropoutinput="true"
     data-testid="DropoutInput"
     value=""
   />

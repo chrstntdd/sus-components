@@ -8,12 +8,28 @@
           "@babel/preset-env",
           {
             "targets": {
-              "node": "current"
+              "node": "current",
+              "esmodules": true
             }
           }
         ]
       ]
     }
   },
-  "presets": ["@babel/typescript", "@babel/react"]
+
+  "presets": [
+    "@babel/typescript",
+    "@babel/react",
+    [
+      "@babel/preset-env",
+      {
+        "shippedProposals": true,
+        "useBuiltIns": "usage",
+        "loose": true,
+        "targets": {
+          "esmodules": true
+        }
+      }
+    ]
+  ]
 }
