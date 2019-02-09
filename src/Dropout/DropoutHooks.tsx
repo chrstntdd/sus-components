@@ -4,6 +4,16 @@ import { Portal } from '../Portal'
 
 import { dropoutReducer, stateChart, wrapEvent } from './shared'
 
+let i = 0
+
+const resetIdCounter = () => {
+  i = 0
+}
+
+const generateId = () => {
+  return i++
+}
+
 const scrollIfNeeded = (el: HTMLElement, container: HTMLElement) => {
   if (el.offsetTop < container.scrollTop) {
     container.scrollTop = el.offsetTop
@@ -52,28 +62,53 @@ const DropoutContext: React.Context<DropoutState> = React.createContext(initialS
 /**
  * @description
  * Main component that **must** wrap all other Dropout components
+ *
+ * @see https://www.w3.org/TR/wai-aria-practices/#combobox
  */
 const Dropout: React.FC = ({ children }) => {
   // @ts-ignore
   const [state, dispatch] = React.useReducer(dropoutReducer, initialState)
 
+  const getItemId = React.useRef(null)
   const optionsRef = React.useRef(null)
   const inputRef = React.useRef(null)
+  const inputId = React.useRef(null)
   const menuRef = React.useRef(null)
+  const menuId = React.useRef(null)
 
-  const shouldMeasure = visibleStates.includes(state.finiteState)
-  const rect = useRect(inputRef, shouldMeasure)
+  React.useEffect(() => {
+    const mainId = `dropout-${generateId()}`
+
+    menuId.current = `${mainId}-menu`
+    inputId.current = `${mainId}-input`
+    getItemId.current = index => `${mainId}-item-${index}`
+  }, [])
+
+  const isInVisibleState = visibleStates.includes(state.finiteState)
+  const rect = useRect(inputRef, isInVisibleState)
 
   const context = {
     ...state,
-    rect,
-    optionsRef,
-    menuRef,
+    dispatch,
+    getItemId,
+    inputId,
     inputRef,
-    dispatch
+    menuId,
+    menuRef,
+    optionsRef,
+    rect
   }
 
-  return <DropoutContext.Provider value={context}>{children}</DropoutContext.Provider>
+  return (
+    <div
+      role="combobox"
+      aria-expanded={isInVisibleState}
+      aria-haspopup="listbox"
+      aria-owns={isInVisibleState ? menuId.current : null}
+    >
+      <DropoutContext.Provider value={context}>{children}</DropoutContext.Provider>
+    </div>
+  )
 }
 
 interface InputProps {
@@ -98,10 +133,12 @@ const DropoutInput: React.FC<InputProps> = ({
 }) => {
   const {
     dispatch,
-    value,
     finiteState,
-    navigationValue,
+    getItemId,
     inputRef,
+    menuId,
+    navigationValue,
+    value,
     optionsRef: { current: options }
   } = React.useContext(DropoutContext)
 
@@ -204,11 +241,26 @@ const DropoutInput: React.FC<InputProps> = ({
         navigationValue || value
       : value
 
+  const isInVisibleState = visibleStates.includes(finiteState)
+
+  let activeDescendant = null
+
+  if (isInVisibleState) {
+    for (let i = 0; i < options.length; i++) {
+      if (options[i] === navigationValue) {
+        activeDescendant = getItemId.current(i)
+      }
+    }
+  }
+
   return (
     <input
       ref={inputRef}
+      role="textbox" // or searchbox
       aria-autocomplete="list"
-      aria-label="TODO"
+      aria-activedescendant={isInVisibleState ? activeDescendant : null}
+      aria-controls={isInVisibleState ? menuId.current : null}
+      aria-multiline={false}
       data-dropoutinput
       {...props}
       value={inputValue}
@@ -225,13 +277,15 @@ let selectingWithClickNode = null
 
 const DropoutList: React.FC = ({ children }) => {
   const {
-    optionsRef,
-    navigationValue,
-    menuRef,
-    value,
-    rect,
     dispatch,
-    finiteState
+    finiteState,
+    getItemId,
+    menuId,
+    menuRef,
+    navigationValue,
+    optionsRef,
+    rect,
+    value
   } = React.useContext(DropoutContext)
 
   /**
@@ -264,9 +318,10 @@ const DropoutList: React.FC = ({ children }) => {
 
   if (!children) return null
 
-  const clones = React.Children.map(children, child =>
+  const clones = React.Children.map(children, (child, index) =>
     // @ts-ignore
     React.cloneElement(child, {
+      id: getItemId.current ? getItemId.current(index) : null,
       menuRef,
       dispatch,
       navigationValue,
@@ -277,8 +332,8 @@ const DropoutList: React.FC = ({ children }) => {
   const el = visibleStates.includes(finiteState) && rect && (
     <ul
       ref={menuRef}
+      id={menuId.current}
       role="listbox"
-      aria-label="TODO"
       data-dropoutmenu
       style={{
         top: rect.bottom,
@@ -301,7 +356,7 @@ interface DropoutOptionProps {
 }
 
 const DropoutOption: React.FC<DropoutOptionProps & ImplicitContext> = React.memo(
-  ({
+  function DropoutOption({
     children,
     value,
 
@@ -315,7 +370,7 @@ const DropoutOption: React.FC<DropoutOptionProps & ImplicitContext> = React.memo
     onClick,
     onMouseDown,
     ...props
-  }) => {
+  }) {
     const root = React.useRef(null)
     /**
      * @description
@@ -349,6 +404,7 @@ const DropoutOption: React.FC<DropoutOptionProps & ImplicitContext> = React.memo
     return (
       <li
         ref={root}
+        role="option"
         {...props}
         data-dropoutitem
         aria-selected={isActive}
@@ -370,4 +426,4 @@ const DropoutOption: React.FC<DropoutOptionProps & ImplicitContext> = React.memo
   }
 )
 
-export { Dropout, DropoutInput, DropoutList, DropoutOption }
+export { Dropout, DropoutInput, DropoutList, DropoutOption, resetIdCounter }

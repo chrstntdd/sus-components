@@ -2,7 +2,7 @@ import React from 'react'
 
 import { render, fireEvent } from 'react-testing-library'
 
-import { Dropout, DropoutInput, DropoutList, DropoutOption } from '.'
+import { Dropout, DropoutInput, DropoutList, DropoutOption, resetIdCounter } from '.'
 
 jest.mock('@/Portal', () => ({
   Portal: ({ children }) => <div>{children}</div>
@@ -28,13 +28,18 @@ const setup = (itemCount: number, inputProps = {}) => (
 )
 
 const initialView = `
-<div>
+<div
+  aria-expanded="false"
+  aria-haspopup="listbox"
+  role="combobox"
+>
   <input
     aria-autocomplete="list"
-    aria-label="TODO"
+    aria-multiline="false"
     class="input"
     data-dropoutinput="true"
     data-testid="DropoutInput"
+    role="textbox"
     value=""
   />
   <div />
@@ -42,10 +47,12 @@ const initialView = `
 `
 
 describe('Dropout Component', () => {
+  afterEach(resetIdCounter)
+
   it('should render something', () => {
     const { container } = render(setup(5))
 
-    expect(container).toMatchInlineSnapshot(initialView)
+    expect(container.firstChild).toMatchInlineSnapshot(initialView)
   })
 
   describe('keyboard interactions', () => {
@@ -307,4 +314,54 @@ describe('Dropout Component', () => {
       })
     })
   })
+
+  it('should have role="option" set on each item in the list', () => {
+    const { getByTestId } = render(setup(5))
+
+    const input = getByTestId('DropoutInput')
+
+    fireEvent.focus(input)
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    // \\
+    makeArr(5).forEach(i => {
+      expect(getByTestId(`option-${i}`)).toHaveAttribute('role', 'option')
+    })
+  })
+
+  it('should set the aria-activedescendant attribute on the input to the id of the active item', () => {
+    const { getByTestId } = render(setup(5))
+
+    const input = getByTestId('DropoutInput')
+
+    fireEvent.focus(input)
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(getByTestId(`DropoutInput`)).toHaveAttribute('aria-activedescendant', 'dropout-0-item-0')
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(getByTestId(`DropoutInput`)).toHaveAttribute('aria-activedescendant', 'dropout-0-item-1')
+
+    fireEvent.keyDown(input, { key: 'ArrowUp' })
+    fireEvent.keyDown(input, { key: 'ArrowUp' })
+    expect(getByTestId(`DropoutInput`)).not.toHaveAttribute('aria-activedescendant')
+  })
+
+  it('should set the aria-controls attribute on the input to the id of the menu container when the items are visible', () => {
+    const { getByTestId } = render(setup(5))
+
+    const input = getByTestId('DropoutInput')
+
+    fireEvent.focus(input)
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    expect(getByTestId(`DropoutInput`)).toHaveAttribute('aria-controls', 'dropout-0-menu')
+  })
+
+  test.todo(
+    'should allow the control of the active item when navigating through to support dividers'
+  )
 })

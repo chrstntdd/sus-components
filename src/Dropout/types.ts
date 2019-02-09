@@ -14,6 +14,9 @@ interface DropoutState {
   rect: ClientRect | DOMRect
   optionsRef: React.MutableRefObject<any[]>
   finiteState: FiniteDropoutStates
+  menuId: React.MutableRefObject<string>
+  inputId: string
+  getItemId: React.MutableRefObject<(index: number) => string>
   menuRef: React.MutableRefObject<HTMLUListElement>
   inputRef: React.MutableRefObject<HTMLInputElement>
   /* the value that the user has typed */
