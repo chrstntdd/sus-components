@@ -1,3 +1,13 @@
+let i = 0
+
+const resetIdCounter = () => {
+  i = 0
+}
+
+const generateId = () => {
+  return i++
+}
+
 const stateChart = {
   initial: 'idle',
   idle: {
@@ -92,4 +102,25 @@ const wrapEvent = (handler, cb) => (event: React.SyntheticEvent) => {
   if (!event.defaultPrevented) return cb(event)
 }
 
-export { stateChart, dropoutReducer, wrapEvent, measureElements }
+const scrollIfNeeded = (el: HTMLElement, container: HTMLElement) => {
+  if (el.offsetTop < container.scrollTop) {
+    container.scrollTop = el.offsetTop
+  } else {
+    const offsetBottom = el.offsetTop + el.offsetHeight
+    const scrollBottom = container.scrollTop + container.offsetHeight
+
+    if (offsetBottom > scrollBottom) {
+      container.scrollTop = offsetBottom - container.offsetHeight
+    }
+  }
+}
+
+export {
+  stateChart,
+  dropoutReducer,
+  wrapEvent,
+  measureElements,
+  scrollIfNeeded,
+  resetIdCounter,
+  generateId
+}

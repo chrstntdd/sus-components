@@ -100,7 +100,7 @@ function* enumerate(it, start?: number) {
 const items = []
 
 for (const [_, x] of enumerate(fibonacci())) {
-  if (x > 50) break
+  if (x > 10e20) break
   items.push(x)
 }
 

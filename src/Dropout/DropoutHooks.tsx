@@ -2,30 +2,14 @@ import * as React from 'react'
 
 import { Portal } from '../Portal'
 
-import { dropoutReducer, stateChart, wrapEvent } from './shared'
-
-let i = 0
-
-const resetIdCounter = () => {
-  i = 0
-}
-
-const generateId = () => {
-  return i++
-}
-
-const scrollIfNeeded = (el: HTMLElement, container: HTMLElement) => {
-  if (el.offsetTop < container.scrollTop) {
-    container.scrollTop = el.offsetTop
-  } else {
-    const offsetBottom = el.offsetTop + el.offsetHeight
-    const scrollBottom = container.scrollTop + container.offsetHeight
-
-    if (offsetBottom > scrollBottom) {
-      container.scrollTop = offsetBottom - container.offsetHeight
-    }
-  }
-}
+import {
+  dropoutReducer,
+  generateId,
+  resetIdCounter,
+  scrollIfNeeded,
+  stateChart,
+  wrapEvent
+} from './shared'
 
 /**
  * @description
