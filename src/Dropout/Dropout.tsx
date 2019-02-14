@@ -15,6 +15,7 @@ interface DropoutProps {
  * Main component that **must** wrap all other Dropout components
  */
 class Dropout extends React.PureComponent<DropoutProps, DropoutState> {
+  // @ts-ignore
   readonly state: DropoutState = {
     dispatch: (action: DropoutAction) => {
       this.setState(state => dropoutReducer(state, action))

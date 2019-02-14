@@ -14,8 +14,9 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "pretty": true,
-    "target": "es5",
+    "target": "esnext",
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["src/**/*.spec.*"]
 }

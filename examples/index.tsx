@@ -14,6 +14,8 @@ import {
 
 import { randomEmoji } from '../src/random'
 
+import './index.scss'
+
 const shuffle = (a: any[]) => {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -61,17 +63,6 @@ const Home = () => (
         <BackgroundImage key={src} src={src} critical={i < 3}>
           <div />
         </BackgroundImage>
-        // <SusImage
-        //   key={src}
-        //   src={src}
-        //   critical={i < 3}
-        //   style={{
-        //     display: 'flex',
-        //     margin: '2rem',
-        //     minHeight: '600px',
-        //     minWidth: '800px'
-        //   }}
-        // />
       ))}
     </div>
   </div>
