@@ -99,15 +99,10 @@ const Dropout: React.FC = ({ children }) => {
   )
 }
 
-interface InputProps {
-  onBlur: (e: any) => void
-  onChange: (e: any) => void
-  onClick: (e: any) => void
-  onFocus: (e: any) => void
-  onKeyDown: (e: any) => void
+type InputProps = {
   selectOnClick?: boolean
   autocompleteOnNav?: boolean
-}
+} & React.HTMLProps<HTMLInputElement>
 
 const DropoutInput: React.FC<InputProps> = ({
   selectOnClick = false,
