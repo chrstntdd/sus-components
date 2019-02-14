@@ -24,14 +24,14 @@ import {
  * The re-render of this hook are required to flush updates to
  * the context and all the items in the list.
  */
-const useRect = (nodeRef: React.MutableRefObject<HTMLElement>, observe = true) => {
-  const [rect, setRect] = React.useState(null)
+const useMeasureDomNode = (nodeRef: React.MutableRefObject<HTMLElement>, observe = true) => {
+  const [nodeDimensions, setNodeDimensions] = React.useState(() => null)
 
   React.useEffect(() => {
-    setRect(nodeRef.current.getBoundingClientRect())
+    setNodeDimensions(nodeRef.current.getBoundingClientRect())
   }, [observe])
 
-  return rect
+  return nodeDimensions
 }
 
 const initialState = {
@@ -40,7 +40,8 @@ const initialState = {
   value: ''
 }
 
-// @ts-ignore
+// @ts-ignore We only need a bit of state to kickoff the state machine,
+// the rest it taken care of in the renders.
 const DropoutContext: React.Context<DropoutState> = React.createContext(initialState)
 
 /**
@@ -69,19 +70,22 @@ const Dropout: React.FC = ({ children }) => {
   }, [])
 
   const isInVisibleState = visibleStates.includes(state.finiteState)
-  const rect = useRect(inputRef, isInVisibleState)
+  const rect = useMeasureDomNode(inputRef, isInVisibleState)
 
-  const context = {
-    ...state,
-    dispatch,
-    getItemId,
-    inputId,
-    inputRef,
-    menuId,
-    menuRef,
-    optionsRef,
-    rect
-  }
+  const context = React.useMemo(
+    () => ({
+      ...state,
+      dispatch,
+      getItemId,
+      inputId,
+      inputRef,
+      menuId,
+      menuRef,
+      optionsRef,
+      rect
+    }),
+    [inputId, menuId, menuRef, optionsRef, rect, state.value, state.navigationValue]
+  )
 
   return (
     <div
