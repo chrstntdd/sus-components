@@ -14,6 +14,8 @@ import {
 
 import { randomEmoji } from '../src/random'
 
+import './index.scss'
+
 const shuffle = (a: any[]) => {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -61,17 +63,6 @@ const Home = () => (
         <BackgroundImage key={src} src={src} critical={i < 3}>
           <div />
         </BackgroundImage>
-        // <SusImage
-        //   key={src}
-        //   src={src}
-        //   critical={i < 3}
-        //   style={{
-        //     display: 'flex',
-        //     margin: '2rem',
-        //     minHeight: '600px',
-        //     minWidth: '800px'
-        //   }}
-        // />
       ))}
     </div>
   </div>
@@ -159,8 +150,8 @@ const MatchMediaPage = () => {
 }
 
 const App = () => {
-  try {
-    return (
+  return (
+    <React.unstable_ConcurrentMode>
       <React.Fragment>
         <nav className="nav-links">
           <Link to="/">Home</Link>
@@ -175,10 +166,8 @@ const App = () => {
           </Router>
         </main>
       </React.Fragment>
-    )
-  } catch (error) {
-    console.log({ error })
-  }
+    </React.unstable_ConcurrentMode>
+  )
 }
 
 ReactDom.unstable_createRoot(document.getElementById('root')).render(<App />)
