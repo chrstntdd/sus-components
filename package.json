@@ -17,7 +17,8 @@
     "url": "https://github.com/chrstntdd/sus-components.git"
   },
   "scripts": {
-    "dev": "concurrently -k -p '[{name}]' -n 'Library,ExampleApp' -c 'green.bold,cyan.bold' './scripts/build.ts dev-lib' 'yarn use'",
+    "dev": "concurrently -k -p '[{name}]' -n 'Library,ExampleApp' -c 'green.bold,cyan.bold' 'yarn watch-lib' 'yarn use'",
+    "watch-lib": "./scripts/build.ts dev-lib",
     "trans": "./scripts/build.ts transpile-only",
     "build-lib": "./scripts/build.ts build-lib",
     "use": "NODE_ENV='development' ./node_modules/.bin/webpack-dev-server --quiet --color -c webpack.config.ts",
