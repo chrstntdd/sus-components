@@ -150,8 +150,8 @@ const MatchMediaPage = () => {
 }
 
 const App = () => {
-  try {
-    return (
+  return (
+    <React.unstable_ConcurrentMode>
       <React.Fragment>
         <nav className="nav-links">
           <Link to="/">Home</Link>
@@ -166,10 +166,8 @@ const App = () => {
           </Router>
         </main>
       </React.Fragment>
-    )
-  } catch (error) {
-    console.log({ error })
-  }
+    </React.unstable_ConcurrentMode>
+  )
 }
 
 ReactDom.unstable_createRoot(document.getElementById('root')).render(<App />)
