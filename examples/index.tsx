@@ -68,8 +68,6 @@ const Home = () => (
   </div>
 )
 
-const Thing = ({ children }) => <div>{children}</div>
-
 function* fibonacci() {
   let fn1 = 0
   let fn2 = 1
@@ -88,25 +86,36 @@ function* enumerate(it, start?: number) {
   }
 }
 
-const items = []
+const getSomeNums = () => {
+  let items = []
 
-for (const [_, x] of enumerate(fibonacci())) {
-  if (x > 10e20) break
-  items.push(x)
+  for (const [_, x] of enumerate(fibonacci())) {
+    if (x > 10e20) break
+    items.push(x)
+  }
+
+  return items
 }
 
 const DropoutPage = () => {
+  let [items, setItems] = React.useState(getSomeNums)
   return (
     <div className="dropout-page">
-      <Dropout>
-        <DropoutInput className="input" selectOnClick={true} />
+      <Dropout options={items}>
+        <DropoutInput
+          className="input"
+          selectOnClick={true}
+          onChange={_ => {
+            setItems(shuffle(getSomeNums()))
+          }}
+        />
 
         <DropoutList>
           {items.map((el, i) => {
             const val = `${randomEmoji()}${el}`
             return (
               <DropoutOption key={i} value={val}>
-                <Thing>{val}</Thing>
+                {val}
               </DropoutOption>
             )
           })}

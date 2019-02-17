@@ -37,7 +37,6 @@ const initialView = `
     aria-autocomplete="list"
     aria-multiline="false"
     class="input"
-    data-dropoutinput="true"
     data-testid="DropoutInput"
     role="textbox"
     value=""

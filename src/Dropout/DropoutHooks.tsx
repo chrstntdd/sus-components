@@ -84,7 +84,18 @@ const Dropout: React.FC = ({ children }) => {
       optionsRef,
       rect
     }),
-    [inputId, menuId, menuRef, optionsRef, rect, state.value, state.navigationValue]
+    [
+      dispatch,
+      getItemId,
+      inputId,
+      inputRef,
+      menuId,
+      menuRef,
+      optionsRef,
+      rect,
+      state.value,
+      state.navigationValue
+    ]
   )
 
   return (
@@ -141,6 +152,10 @@ const DropoutInput: React.FC<InputProps> = ({
     }
   }, [])
 
+  const expandDropout = () => {
+    dispatch({ type: 'NAVIGATE', value: null })
+  }
+
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       switch (event.key) {
@@ -153,9 +168,8 @@ const DropoutInput: React.FC<InputProps> = ({
           if (!options || options.length === 0) return
 
           if (finiteState === 'idle') {
-            // Opening a closed list, we don't want to select anything,
-            // just open it.
-            dispatch({ type: 'NAVIGATE', value: null })
+            // Opening a closed list, we don't want to select anything, just open it.
+            expandDropout()
           } else {
             const index = options.indexOf(navigationValue)
             const atBottom = index === options.length - 1
@@ -244,7 +258,6 @@ const DropoutInput: React.FC<InputProps> = ({
       aria-activedescendant={isInVisibleState ? activeDescendant : null}
       aria-controls={isInVisibleState ? menuId.current : null}
       aria-multiline={false}
-      data-dropoutinput
       {...props}
       value={inputValue}
       onBlur={wrapEvent(onBlur, handleBlur)}
@@ -297,7 +310,7 @@ const DropoutList: React.FC = ({ children }) => {
     return () => {
       optionsRef.current = null
     }
-  })
+  }, [finiteState])
 
   if (!children) return null
 
@@ -317,7 +330,6 @@ const DropoutList: React.FC = ({ children }) => {
       ref={menuRef}
       id={menuId.current}
       role="listbox"
-      data-dropoutmenu
       style={{
         top: rect.bottom,
         left: rect.left,
@@ -333,6 +345,7 @@ const DropoutList: React.FC = ({ children }) => {
 
 interface DropoutOptionProps {
   children: React.ReactElement<any>
+  /* In order to optimize the Option component, the value **MUST** always be a string to enable easy diffing */
   value: string
   onClick?: (e: any) => void
   onMouseDown?: (e: any) => void
@@ -389,7 +402,6 @@ const DropoutOption: React.FC<DropoutOptionProps & ImplicitContext> = React.memo
         ref={root}
         role="option"
         {...props}
-        data-dropoutitem
         aria-selected={isActive}
         onClick={wrapEvent(onClick, handleClick)}
         onMouseDown={wrapEvent(onMouseDown, handleMouseDown)}
@@ -402,7 +414,8 @@ const DropoutOption: React.FC<DropoutOptionProps & ImplicitContext> = React.memo
     /* Simple check, probably buggy when the children change */
     const wasActive = prevProps.navigationValue === prevProps.value
     const isActive = nextProps.navigationValue === nextProps.value
-    if (wasActive === isActive) {
+
+    if (wasActive === isActive && prevProps.value === nextProps.value) {
       return true
     }
     return false
