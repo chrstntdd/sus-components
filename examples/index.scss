@@ -10,6 +10,50 @@
   }
 }
 
+.accordion-page {
+  font-family: 'Operator Mono Lig';
+  height: 100vh;
+  width: 100vw;
+
+  .accordion-content {
+    padding: 0.4rem;
+  }
+
+  .accordion {
+    top: 10rem;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 420px;
+    box-shadow: 0px 6px 14px 5px rgba(0, 0, 0, 0.2);
+
+    .fold {
+      padding: 0.8rem;
+      border-bottom: 1px solid lightgrey;
+    }
+  }
+
+  [role='tabpanel'] {
+    // Animating max-height :(
+    transition: max-height 0.9s cubic-bezier(0, 1, 0.5, 1), opacity 0.4s ease-in-out;
+    &[aria-hidden='true'] {
+      // overflow: hidden is **NECESSARY** to not cause the
+      // page to increase in height if the hidden content is
+      // long, causing the page to appear longer than it is.
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      max-height: 0px;
+      pointer-events: none;
+    }
+    &[aria-hidden='false'] {
+      opacity: 1;
+      max-height: 300px;
+      overflow-y: scroll;
+    }
+  }
+}
+
 .dropout-page {
   display: flex;
   flex-direction: column;

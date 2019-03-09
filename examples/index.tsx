@@ -14,6 +14,8 @@ import {
 
 import { randomEmoji } from '../src/random'
 
+const AccordionPage = React.lazy(() => import('./AccordionPage'))
+
 import './index.scss'
 
 const shuffle = (a: any[]) => {
@@ -161,20 +163,24 @@ const MatchMediaPage = () => {
 const App = () => {
   return (
     <React.unstable_ConcurrentMode>
-      <React.Fragment>
-        <nav className="nav-links">
-          <Link to="/">Home</Link>
-          <Link to="/dropout">Dropout</Link>
-          <Link to="/match-media">Match Media</Link>
-        </nav>
-        <main>
-          <Router>
-            <Home path="/" />
-            <DropoutPage path="/dropout" />
-            <MatchMediaPage path="/match-media" />
-          </Router>
-        </main>
-      </React.Fragment>
+      <React.Suspense fallback="LOADING!">
+        <React.Fragment>
+          <nav className="nav-links">
+            <Link to="/">Home</Link>
+            <Link to="/dropout">Dropout</Link>
+            <Link to="/match-media">Match Media</Link>
+            <Link to="/accordion">Accordion</Link>
+          </nav>
+          <main>
+            <Router>
+              <Home path="/" />
+              <DropoutPage path="/dropout" />
+              <MatchMediaPage path="/match-media" />
+              <AccordionPage path="/accordion" />
+            </Router>
+          </main>
+        </React.Fragment>
+      </React.Suspense>
     </React.unstable_ConcurrentMode>
   )
 }
