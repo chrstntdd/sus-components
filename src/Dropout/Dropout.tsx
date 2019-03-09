@@ -214,7 +214,6 @@ class DropoutInput extends React.Component<InputProps & React.HTMLProps<HTMLInpu
 }
 
 interface DropoutListProps {
-  children: React.ReactElement<any>[]
   style?: React.CSSProperties
 }
 
@@ -263,9 +262,11 @@ class DropoutList extends React.PureComponent<DropoutListProps, {}> {
     const { navigationValue, value, rect, dispatch, finiteState } = this.context
 
     // useEffect? to update context not sure if needed with legacy react
+    // @ts-ignore
     this.context.optionsRef.current = React.Children.map(children, ({ props: { value } }) => value)
 
     const clones = React.Children.map(children, child =>
+      // @ts-ignore
       React.cloneElement(child, {
         dispatch,
         navigationValue,
