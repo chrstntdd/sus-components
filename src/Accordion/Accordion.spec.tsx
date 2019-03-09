@@ -1,22 +1,19 @@
 import React from 'react'
+import 'jest-dom/extend-expect'
 
-import { render } from 'react-testing-library'
+import { render, fireEvent } from 'react-testing-library'
 
 import { Accordion, Fold } from '.'
 
 const setup = () => {
   return (
     <Accordion>
-      <div className="menu-item">no items</div>
-
-      <Fold label="a" id="a" sectionId="a">
-        <div>A</div>
+      <Fold label="Label A" id="a" sectionId="a">
+        <div>Content A</div>
       </Fold>
 
-      <div>Another thing with no items</div>
-
-      <Fold label="b" id="b" sectionId="b">
-        <div>B</div>
+      <Fold label="Label B" id="b" sectionId="b">
+        <div>Content B</div>
       </Fold>
     </Accordion>
   )
@@ -26,62 +23,59 @@ describe('Accordion component', () => {
   it('should render something', () => {
     const { container } = render(setup())
 
-    expect(container.firstChild).toMatchInlineSnapshot(`
-<div
-  class="accordion"
-  role="tablist"
->
-  <div
-    class="menu-item"
-  >
-    no items
-  </div>
-  <div
-    aria-controls="a"
-    class="fold"
-    id="a"
-    role="tab"
-    tabindex="0"
-  >
-    a
-  </div>
-  <div
-    aria-hidden="true"
-    aria-labelledby="a"
-    id="a"
-    role="tabpanel"
-    tabindex="0"
-  >
-    <div>
-      A
-    </div>
-  </div>
-  <div>
-    Another thing with no items
-  </div>
-  <div
-    aria-controls="b"
-    class="fold"
-    id="b"
-    role="tab"
-    tabindex="0"
-  >
-    b
-  </div>
-  <div
-    aria-hidden="true"
-    aria-labelledby="b"
-    id="b"
-    role="tabpanel"
-    tabindex="0"
-  >
-    <div>
-      B
-    </div>
-  </div>
-</div>
-`)
+    expect(container.firstChild).toBeDefined()
   })
-  test.todo('should b')
-  test.todo('should c')
+
+  it('should toggle the visibility of the content when the tab is focused and the Spacebar is pressed', () => {
+    const { container } = render(setup())
+
+    const firstTab = container.querySelector('[role="tab"]')
+
+    fireEvent.focus(firstTab)
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+    fireEvent.keyDown(firstTab, { keyCode: 32 })
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'false')
+    fireEvent.keyDown(firstTab, { keyCode: 32 })
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('should toggle the visibility of the content when the tab is focused and the Enter key is pressed', () => {
+    const { container } = render(setup())
+
+    const firstTab = container.querySelector('[role="tab"]')
+
+    fireEvent.focus(firstTab)
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+    fireEvent.keyDown(firstTab, { keyCode: 13 })
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'false')
+    fireEvent.keyDown(firstTab, { keyCode: 13 })
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('should noop on keys other than " " and Enter', () => {
+    const { container } = render(setup())
+
+    const firstTab = container.querySelector('[role="tab"]')
+
+    fireEvent.focus(firstTab)
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+    for (let index = 0; index < 255; index++) {
+      if (index !== 32 && index !== 13) {
+        fireEvent.keyDown(firstTab, { keyCode: index })
+      }
+    }
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('should toggle the visibility of the content when the tab when clicked', () => {
+    const { container } = render(setup())
+
+    const firstTab = container.querySelector('[role="tab"]')
+
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+    fireEvent.click(firstTab)
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'false')
+    fireEvent.click(firstTab)
+    expect(container.querySelector('[role="tabpanel"')).toHaveAttribute('aria-hidden', 'true')
+  })
 })

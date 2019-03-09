@@ -1,26 +1,26 @@
 import React from 'react'
-
 import { nextUuid } from './helpers'
 
-const AccordionContext = React.createContext({
-  setExpanded: (uuid: number, expanded: boolean) => {},
-  state: -1
-})
+const AccordionContext = React.createContext({} as any)
 
-const Accordion: React.FC = ({ children }) => {
-  const [state, setState] = React.useState(-1)
-  const setExpanded = (uuid: number, expanded: boolean) => {
-    if (expanded) {
-      setState(uuid)
-    } else {
-      setState(-1)
-    }
-  }
+interface AccordionProps {
+  keepOpen?: boolean
+}
 
-  const value = {
-    setExpanded,
-    state
+const accordionReducer = (state: number, action) => {
+  switch (action.type) {
+    case 'TOGGLE':
+      if (state === action.id) {
+        return -1
+      }
+      return action.id
   }
+}
+
+const Accordion: React.FC<AccordionProps> = ({ children, keepOpen }) => {
+  const [state, dispatch] = React.useReducer(accordionReducer, -1)
+
+  const value = { state, dispatch }
 
   return (
     <AccordionContext.Provider value={value}>
@@ -43,34 +43,33 @@ interface FoldProps {
  * An accordion item
  */
 const Fold: React.FC<FoldProps> = ({ label, id, sectionId, children }) => {
-  const { setExpanded, state } = React.useContext(AccordionContext)
-
+  const { state, dispatch } = React.useContext(AccordionContext)
   const uuid = React.useRef(null)
 
   React.useEffect(() => {
     uuid.current = nextUuid()
   }, [])
 
-  const handleToggle = () => {
-    setExpanded(uuid.current, state !== uuid.current)
-  }
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleToggle()
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.keyCode === 32 || event.keyCode === 13) {
+      dispatch({ type: 'TOGGLE', id: uuid.current })
     }
   }
 
+  const handleClick = () => {
+    dispatch({ type: 'TOGGLE', id: uuid.current })
+  }
+
   return (
-    <>
+    <div className="container-thing">
       <div
         className="fold"
         role="tab"
         tabIndex={0}
         id={id}
         aria-controls={sectionId}
-        onClick={handleToggle}
         onKeyDown={handleKeyDown}
+        onClick={handleClick}
         // aria-selected={} TODO
       >
         {label}
@@ -84,7 +83,7 @@ const Fold: React.FC<FoldProps> = ({ label, id, sectionId, children }) => {
       >
         {children}
       </div>
-    </>
+    </div>
   )
 }
 
